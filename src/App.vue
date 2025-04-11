@@ -1,17 +1,26 @@
 <script setup>
 import { RouterLink, RouterView } from "vue-router";
-import HelloWorld from "./components/HelloWorld.vue";
+import Sidebar from "@/components/Sidebar.vue";
 </script>
 
 <template>
-  <!-- <header>
-    <nav>
-      <RouterLink to="/">Home</RouterLink>
-      <RouterLink to="/about">About</RouterLink>
-    </nav>
-  </header> -->
-
-  <RouterView />
+  <div class="app-container">
+    <Sidebar class="sidebar" />
+    <main class="main-content">
+      <RouterView />
+    </main>
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.app-container {
+  display: flex;
+  height: 100vh;
+}
+.main-content {
+  flex: 1;
+  padding: 20px;
+  color: var(--c-light-navy);
+  overflow-y: auto;
+}
+</style>
