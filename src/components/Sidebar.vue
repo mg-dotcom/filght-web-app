@@ -173,7 +173,6 @@ const activeUsers = [
   flex-direction: column;
   padding: 0 15px;
 }
-
 .navigation ul {
   list-style: none;
   padding: 0;
@@ -186,8 +185,7 @@ const activeUsers = [
   padding: 12px 20px;
   margin: 6px 0;
   cursor: pointer;
-  transition: all 0.3s ease;
-  border-radius: 16px;
+  border-radius: 25px 0 0 25px;
   position: relative;
   margin-right: -16px;
   gap: 12px;
@@ -195,9 +193,10 @@ const activeUsers = [
 
 .nav-item:hover:not(.active) {
   background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 16px 0 0 16px;
+  border-top-left-radius: 25px;
+  border-bottom-left-radius: 25px;
+  transition: background-color 0.2s ease-in-out;
 }
-
 .nav-item.active {
   background-color: var(--color-background);
   border-radius: 16px 0 0 16px;
@@ -205,24 +204,33 @@ const activeUsers = [
   margin-right: -16px;
   font-weight: 500;
   position: relative;
+  border-top-left-radius: 25px;
+  border-bottom-left-radius: 25px;
   z-index: 2;
 }
 
-.nav-item.active .icon img {
-  filter: invert(65%) sepia(58%) saturate(554%) hue-rotate(358deg)
-    brightness(101%) contrast(106%);
+/* Add curved outside effect to active tab */
+.nav-item.active::before,
+.nav-item.active::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  width: 25px;
+  height: 25px;
+  background-color: transparent;
+  z-index: 1;
 }
 
-.icon {
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.nav-item.active::before {
+  top: -25px;
+  border-bottom-right-radius: 16px;
+  box-shadow: 0 12.5px 0 0 var(--color-background);
 }
 
-.nav-label {
-  font-size: 14px;
+.nav-item.active::after {
+  bottom: -25px;
+  border-top-right-radius: 16px;
+  box-shadow: 0 -12.5px 0 0 var(--color-background);
 }
 
 /* Active Users */
