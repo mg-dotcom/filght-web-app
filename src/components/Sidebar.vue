@@ -85,7 +85,7 @@ const activeUsers = [
 </template>
 
 <style scoped>
-/* Sidebar Styles */
+/* ส่วนของ Sidebar */
 .sidebar {
   width: 220px;
   height: 100vh;
@@ -98,7 +98,7 @@ const activeUsers = [
   overflow: hidden;
 }
 
-/* Profile Section */
+/* ส่วนของ Profile */
 .profile-section {
   background-color: var(--c-dark-navy);
   padding: 30px 0 20px;
@@ -166,7 +166,7 @@ const activeUsers = [
   background-color: rgba(255, 255, 255, 0.8);
 }
 
-/* Navigation */
+/* ส่วนของ Navigation */
 .navigation {
   flex: 1;
   display: flex;
@@ -185,7 +185,6 @@ const activeUsers = [
   padding: 12px 20px;
   margin: 6px 0;
   cursor: pointer;
-  border-radius: 25px 0 0 25px;
   position: relative;
   margin-right: -16px;
   gap: 12px;
@@ -233,7 +232,7 @@ const activeUsers = [
   box-shadow: 0 -12.5px 0 0 var(--color-background);
 }
 
-/* Active Users */
+/* ส่วนของ Active Users */
 .active-users-section {
   padding: 15px;
   text-align: center;
@@ -284,7 +283,6 @@ const activeUsers = [
   font-weight: 500;
 }
 
-/* World Map fixed to bottom and blue */
 .world-map {
   margin-top: auto;
   padding: 15px;
