@@ -195,8 +195,9 @@ const activeUsers = [
   background-color: rgba(255, 255, 255, 0.1);
   border-top-left-radius: 25px;
   border-bottom-left-radius: 25px;
-  transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.3s ease;
 }
+
 .nav-item.active {
   background-color: var(--color-background);
   border-radius: 16px 0 0 16px;
@@ -209,7 +210,6 @@ const activeUsers = [
   z-index: 2;
 }
 
-/* Add curved outside effect to active tab */
 .nav-item.active::before,
 .nav-item.active::after {
   content: "";
