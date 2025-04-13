@@ -6,7 +6,8 @@ const router = useRouter();
 
 const navItems = [
   { icon: "home", label: "Dashboard", path: "/dashboard" },
-  { icon: "users", label: "Management", path: "/management" },
+  // temporarily for management-seat
+  { icon: "users", label: "Management", path: "/management/seat" },
   { icon: "file-text", label: "Reports", path: "/reports" },
   { icon: "settings", label: "Setting", path: "/settings" },
 ];
