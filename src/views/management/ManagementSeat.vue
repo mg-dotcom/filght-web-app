@@ -1,5 +1,13 @@
 <script setup>
 import { ref } from "vue";
+import {
+  seatData,
+  getUniqueRows,
+  formatSeatId,
+  getSeatStatus,
+  getSeatInfo,
+  isSeatAvailable,
+} from "@/data/management-seat.js";
 
 const isStatusDropdownOpen = ref(false);
 const statusOptions = ref([
@@ -15,7 +23,7 @@ const toggleStatusDropdown = () => {
 
 <template>
   <div class="management-seat">
-    <!-- Left notches -->
+    <!-- มุมปะฝั่งซ้าย -->
     <div class="notches left-notches">
       <div class="notch" v-for="index in 7" :key="`left-${index}`"></div>
     </div>
@@ -130,9 +138,136 @@ const toggleStatusDropdown = () => {
           </div>
         </div>
       </div>
+
+      <div class="management-seat-container">
+        <div class="select-seat">
+          <div class="select-seat-header">Select Your Seat</div>
+          <div class="select-seat-content">
+            <p>Show Passenger's Check-In Status</p>
+          </div>
+        </div>
+        <div class="type-seat">
+          <div class="type reserve-seat">
+            <img
+              src="/management-pic/management-seat/reserve-seat-type.png"
+              alt=""
+            />
+            <p>
+              Reserved<br />
+              Seat
+            </p>
+          </div>
+          <div class="type reserve-seat">
+            <img
+              src="/management-pic/management-seat/passenger-seat-type.png"
+              alt=""
+            />
+            <p>
+              Passenger<br />
+              Seat
+            </p>
+          </div>
+          <div class="type reserve-seat">
+            <img
+              src="/management-pic/management-seat/unreserve-seat-type.png"
+              alt=""
+            />
+            <p>Unreserved <br />Seat</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="seat-view-container">
+        <div class="seat-view">
+          <div class="seat-class-types">
+            <div
+              v-for="classType in seatData.classTypes"
+              :key="classType.id"
+              :class="['class-type-btn', { active: classType.active }]"
+            >
+              {{ classType.name }}
+            </div>
+          </div>
+
+          <div class="seat-grid">
+            <div class="seat-columns">
+              <div
+                class="column-header"
+                v-for="col in [
+                  'A',
+                  'B',
+                  'C',
+                  '',
+                  'D',
+                  'E',
+                  'F',
+                  '',
+                  'G',
+                  'H',
+                  'I',
+                ]"
+                :key="'header-' + col"
+                :class="{ spacer: col === '' }"
+              >
+                {{ col }}
+              </div>
+            </div>
+
+            <div
+              class="seat-row"
+              v-for="rowNum in getUniqueRows()"
+              :key="rowNum"
+            >
+              <div class="row-header">{{ rowNum }}</div>
+
+              <div class="seat-grid-row">
+                <div
+                  v-for="col in [
+                    'A',
+                    'B',
+                    'C',
+                    '',
+                    'D',
+                    'E',
+                    'F',
+                    '',
+                    'G',
+                    'H',
+                    'I',
+                  ]"
+                  :key="`${rowNum}-${col || 'spacer'}`"
+                  class="seat-container"
+                >
+                  <div
+                    v-if="col !== ''"
+                    class="seat"
+                    :class="getSeatStatus(formatSeatId(rowNum, col))"
+                    :title="getSeatInfo(formatSeatId(rowNum, col))"
+                  >
+                    <div class="seat-icon">
+                      <img
+                        v-if="isSeatAvailable(formatSeatId(rowNum, col))"
+                        src="/management-pic/management-seat/unreserve-seat-type.png"
+                        alt="Unreserved Seat"
+                      />
+                      <img
+                        v-else
+                        src="/management-pic/management-seat/reserve-seat-type.png"
+                        alt="Reserved Seat"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row-header">{{ rowNum }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Right notches -->
+    <!-- มุมปะฝั่งขวา -->
     <div class="notches right-notches">
       <div class="notch" v-for="index in 7" :key="`right-${index}`"></div>
     </div>
@@ -146,7 +281,6 @@ const toggleStatusDropdown = () => {
   border-radius: 10px;
   position: relative;
   display: flex;
-  height: calc(100vh - 40px);
   box-sizing: border-box;
 }
 
@@ -403,6 +537,219 @@ const toggleStatusDropdown = () => {
   color: var(--c-navy, #2d4b6d);
   padding: 4px 25px;
   border-radius: 15px;
+}
+
+/* ส่วนของ management seat content */
+.management-seat-container {
+  grid-template-columns: 1fr 1.5fr;
+  display: grid;
+  gap: 20px;
+  padding: 10px 15px;
+}
+
+/* ส่วนของ select seat */
+.select-seat {
+  border: 1px solid #3e7ca3;
+  border-radius: 12px;
+  overflow: hidden;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.select-seat-header {
+  background-color: var(--c-primary, #3e7ca3);
+  color: var(--c-white, #ffffff);
+  font-weight: 500;
+  padding: 10px;
+  text-align: center;
+}
+
+.select-seat-content {
+  background-color: var(--c-white, #ffffff);
+  font-size: 14px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.select-seat-content p {
+  color: #5a6872;
+  text-align: center;
+  font-weight: 400;
+  margin: 0;
+}
+
+/* ส่วนของ type seat */
+.type-seat {
+  display: flex;
+  padding: 12px;
+  justify-content: space-around;
+  border: 1px solid var(--c-navy-light);
+  border-radius: 10px;
+}
+
+.type {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  gap: 5px;
+}
+
+.type p {
+  font-size: 14px;
+  color: var(--vt-c-gray);
+  line-height: 1.2;
+}
+
+/* ส่วนของ seat view type */
+.seat-view-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 15px;
+}
+
+.seat-view {
+  border: 1px solid var(--c-navy-light);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.seat-class-types {
+  display: flex;
+  justify-content: center;
+  gap: 45px;
+  align-items: center;
+  width: 100%;
+  padding: 10px;
+  font-weight: 500;
+}
+
+.seat-class-types div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 25px;
+  gap: 5px;
+  border-radius: 50px;
+  border: 1px solid var(--c-navy-light);
+  font-size: 14px;
+}
+
+.seat-class-types div:hover {
+  background-color: var(--c-navy-light);
+  color: white;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  cursor: pointer;
+}
+
+.seat-class-types div.active {
+  background-color: var(--c-navy-light);
+  color: white;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  cursor: pointer;
+}
+
+/* ส่วนของ seat view */
+
+/* ==== Seat Grid Layout ==== */
+.seat-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* ==== Column Headers ==== */
+.seat-columns {
+  display: grid;
+  margin-top: 15px;
+  grid-template-columns: repeat(11, 50px); /* 9 ที่นั่ง + 2 ช่องว่าง */
+  justify-content: center;
+  margin-bottom: 24px;
+  gap: 8px;
+}
+
+.column-header {
+  text-align: center;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--c-navy-light);
+}
+
+.column-header.spacer {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ==== Seat Styling ==== */
+.seat {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.seat:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+}
+/* ==== Seat Row ==== */
+.seat-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.row-header {
+  width: 32px;
+  font-weight: 500;
+  text-align: center;
+  color: var(--c-navy-light);
+}
+
+.seat-grid-row {
+  display: grid;
+  grid-template-columns: repeat(11, 50px); /* 9 ที่นั่ง + 2 ช่องว่าง */
+  gap: 8px;
+  justify-content: center;
+}
+
+.seat-container {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .seat {
+    width: 56px;
+    height: 56px;
+  }
+
+  .row-header {
+    width: 32px;
+    font-size: 14px;
+  }
+
+  .column-header {
+    font-size: 14px;
+  }
 }
 
 /* ส่วนของมุมปะ พื้นหลังสีขวา */
