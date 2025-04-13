@@ -1,5 +1,5 @@
 <script setup>
-import { Bar } from "vue-chartjs";
+import { Bar, Doughnut, Line } from "vue-chartjs";
 import {
   Chart as ChartJS,
   Title,
@@ -7,119 +7,129 @@ import {
   Legend,
   BarElement,
   CategoryScale,
+  Filler,
+  PointElement,
+  LineElement,
   LinearScale,
+  ArcElement,
 } from "chart.js";
 
-const stats = [
-  { title: "Completed Flights", value: 99 },
-  { title: "Active Flights", value: 99 },
-  { title: "Canceled Flights", value: 99 },
-  { title: "Total Flights", value: 999 },
-];
+import {
+  stats,
+  bookings,
+  chartData,
+  chartOptions,
+  pieChartData,
+  pieChartOptions,
+  legendItemsPopularAirlines,
+  flightsScheduleAnalysisData,
+  flightsScheduleAnalysisOptions,
+} from "@/data/dashboard";
 
-const bookings = [
-  {
-    airline: "Piyavit Airlines",
-    date: "Mar 09, 2024",
-    seats: 350,
-    departure: { time: "18:00", airport: "BKK" },
-    arrival: { time: "07:00", airport: "CNX" },
-    stops: {
-      time: "11hrs",
-      stop: "1 Stop",
-    },
-  },
-  {
-    airline: "Jaturon Airlines",
-    date: "Mar 09, 2024",
-    seats: 350,
-    departure: { time: "16:00", airport: "Bangkok" },
-    arrival: { time: "18:00", airport: "Chiangmai" },
-    stops: {
-      time: "2hrs",
-      stop: "Non-Stop",
-    },
-  },
-];
-
-// Reservation Summary Chart Data
 ChartJS.register(
   Title,
   Tooltip,
   Legend,
   BarElement,
   CategoryScale,
-  LinearScale
+  LinearScale,
+  ArcElement,
+  Filler,
+  PointElement,
+  LineElement
 );
 
-const chartData = {
-  labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+// สร้างข้อมูลสำหรับกราฟแท่ง (Bar Chart)
+const updatedChartData = {
+  ...chartData,
   datasets: [
     {
-      label: "Tickets",
-      data: [2600, 3500, 3000, 1400, 2600, 5000, 4000],
+      ...chartData.datasets[0],
       backgroundColor: [
-        getComputedStyle(document.documentElement).getPropertyValue(
-          "--c-light-blue"
-        ),
-        getComputedStyle(document.documentElement).getPropertyValue(
-          "--c-light-blue"
-        ),
-        getComputedStyle(document.documentElement).getPropertyValue(
-          "--c-light-blue"
-        ),
-        getComputedStyle(document.documentElement).getPropertyValue(
-          "--c-light-blue"
-        ),
-        getComputedStyle(document.documentElement).getPropertyValue(
-          "--c-light-blue"
-        ),
-        getComputedStyle(document.documentElement).getPropertyValue(
-          "--c-light-blue"
+        ...Array(6).fill(
+          getComputedStyle(document.documentElement).getPropertyValue(
+            "--c-light-blue"
+          )
         ),
         getComputedStyle(document.documentElement).getPropertyValue(
           "--c-orange"
         ),
       ],
-      borderRadius: 10,
-      barPercentage: 0.9, 
-      borderSkipped: false, 
     },
   ],
 };
 
-const chartOptions = {
-  responsive: true,
-  plugins: {
-    legend: { display: false },
-  },
-  scales: {
-    y: {
-      beginAtZero: true,
-      ticks: {
-        callback: (value) => `${value / 1000}k`,
-        color: "#94a3b8",
-        font: {
-          size: 12,
-        },
-      },
-      grid: {
-        drawTicks: false,
-        color: "#e2e8f0",
-      },
+// กราฟโดนัท (Doughnut Chart)
+const updatedPieChartData = {
+  ...pieChartData,
+  datasets: [
+    {
+      ...pieChartData.datasets[0],
+      backgroundColor: [
+        getComputedStyle(document.documentElement).getPropertyValue(
+          "--c-orange"
+        ),
+        getComputedStyle(document.documentElement).getPropertyValue("--c-navy"),
+        getComputedStyle(document.documentElement).getPropertyValue(
+          "--c-light-blue"
+        ),
+      ],
     },
-    x: {
-      ticks: {
-        color: "#94a3b8",
-        font: {
-          size: 12,
-        },
-      },
-      grid: {
-        display: false,
-      },
+  ],
+};
+
+// กราฟเส้น (Line Chart)
+function createGradient(baseColor) {
+  return (context) => {
+    const chart = context.chart;
+    const { ctx, chartArea } = chart;
+    if (!chartArea) return;
+    const gradient = ctx.createLinearGradient(
+      0,
+      chartArea.bottom,
+      0,
+      chartArea.top
+    );
+    gradient.addColorStop(0, `${baseColor}00`);
+    gradient.addColorStop(1, `${baseColor}99`);
+    return gradient;
+  };
+}
+
+const updatedFlightsScheduleAnalysisData = {
+  ...flightsScheduleAnalysisData,
+  datasets: [
+    {
+      ...flightsScheduleAnalysisData.datasets[0],
+      borderColor: getComputedStyle(document.documentElement)
+        .getPropertyValue("--c-orange")
+        .trim(),
+      backgroundColor: createGradient(
+        getComputedStyle(document.documentElement)
+          .getPropertyValue("--c-orange")
+          .trim()
+      ),
+      borderWidth: 2,
+      pointRadius: 0,
+      tension: 0.4,
+      fill: true,
     },
-  },
+    {
+      ...flightsScheduleAnalysisData.datasets[1],
+      borderColor: getComputedStyle(document.documentElement)
+        .getPropertyValue("--c-light-blue")
+        .trim(),
+      backgroundColor: createGradient(
+        getComputedStyle(document.documentElement)
+          .getPropertyValue("--c-light-blue")
+          .trim()
+      ),
+      borderWidth: 2,
+      pointRadius: 0,
+      tension: 0.4,
+      fill: true,
+    },
+  ],
 };
 </script>
 
@@ -298,10 +308,71 @@ const chartOptions = {
 
         <div class="summary-header">
           <div>Now</div>
-          <div class="ticket-sold">3500 <span>Tickets Sold</span></div>
+          <div class="ticket-sold">4000 <span>Tickets Sold</span></div>
         </div>
 
-        <Bar class="bar-chart" :data="chartData" :options="chartOptions" />
+        <Bar
+          class="bar-chart"
+          :data="updatedChartData"
+          :options="chartOptions"
+        />
+      </div>
+    </div>
+
+    <div class="airlines-flight-main-content">
+      <div class="popular-airlines">
+        <div class="section-header">
+          <h2>Popular Airlines</h2>
+        </div>
+
+        <div class="pie-chart-container">
+          <div class="pie-chart-popular-airlines">
+            <div class="pie-chart-warpper">
+              <Doughnut
+                :data="updatedPieChartData"
+                :options="pieChartOptions"
+              />
+            </div>
+          </div>
+          <div class="legend-container">
+            <div
+              class="legend-item"
+              v-for="(item, index) in legendItemsPopularAirlines"
+              :key="index"
+            >
+              <div class="legend-left">
+                <span class="color-box" :class="item.airline"></span>
+                <span class="airline-name">{{ item.name }}</span>
+              </div>
+              <div class="percentage">{{ item.percent }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flights-schedule-container">
+        <div class="flights-schedule-header">
+          <div class="section-header">
+            <h2>Flights Schedule</h2>
+          </div>
+          <div class="section-header-icon">
+            <div class="icon-label">
+              <span class="line-domestic"></span>
+              <p>Domestic</p>
+            </div>
+            <div class="icon-label">
+              <span class="line-international"></span>
+              <p>International</p>
+            </div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <Line
+            class="flights-schedule-analysis"
+            :data="updatedFlightsScheduleAnalysisData"
+            :options="flightsScheduleAnalysisOptions"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -681,6 +752,7 @@ const chartOptions = {
   background-color: var(--vt-c-white);
   border-radius: 10px;
   padding: 35px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 }
 
 .summary-header {
@@ -688,6 +760,7 @@ const chartOptions = {
   justify-content: space-between;
   align-items: center;
   color: var(--vt-c-gray);
+  margin-bottom: 20px;
 }
 
 .ticket-sold {
@@ -705,103 +778,157 @@ const chartOptions = {
   color: var(--vt-c-gray);
 }
 
-/* Reservation Summary Chart */
-.bar-chart {
-  flex: 1;
+.chart-container {
+  flex-grow: 1;
+  position: relative;
+  height: 200px;
+  margin-top: 10px;
 }
 
-/* Charts Section */
-.charts-section {
+.bar-chart {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* ส่วนของ  Popular Airlines , Flights Schedule */
+.airlines-flight-main-content {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 1fr 1.55fr;
   gap: 20px;
 }
 
-.airlines-chart,
-.schedule-chart {
+.popular-airlines {
   background-color: var(--vt-c-white);
   border-radius: 10px;
-  padding: 20px;
+  padding: 35px;
 }
 
-h2 {
-  margin-top: 0;
-  color: var(--c-dark-gray-blue);
-  font-size: 1.2rem;
-}
-
-.chart-placeholder {
-  width: 100%;
-  height: 200px;
-  background-color: var(--c-soft-blue);
-  border-radius: 10px;
-  margin: 15px 0;
-}
-
-.chart-placeholder.circular {
-  height: 200px;
-  border-radius: 50%;
+.pie-chart-warpper {
   width: 200px;
-  margin: 20px auto;
-  position: relative;
-  background: conic-gradient(
-    var(--c-orange) 0% 45%,
-    var(--c-gray-blue) 45% 87%,
-    var(--c-light-blue) 87% 100%
-  );
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.airlines-legend {
+.pie-chart-popular-airlines {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.pie-chart-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 20px;
+  align-items: center;
+  gap: 24px;
+}
+
+.legend-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
 .legend-item {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  padding: 6px 0;
+}
+
+.legend-left {
+  display: flex;
+  align-items: center;
 }
 
 .color-box {
-  width: 15px;
-  height: 15px;
-  border-radius: 3px;
-}
-
-.airline-percentage {
-  margin-left: auto;
-  font-weight: bold;
-}
-
-.chart-types {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 15px;
-}
-
-.chart-type {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.9rem;
-}
-
-.chart-type::before {
-  content: "";
   display: inline-block;
-  width: 30px;
-  height: 3px;
-  border-radius: 2px;
+  width: 18px;
+  height: 18px;
+  margin-right: 12px;
 }
 
-.domestic::before {
+.piyanit {
+  background-color: var(--c-orange);
+}
+
+.jaturon {
   background-color: var(--c-navy);
 }
 
-.international::before {
+.others {
+  background-color: var(--c-light-blue);
+}
+
+.airline-name {
+  color: #444;
+  font-size: 14px;
+}
+
+.percentage {
+  font-weight: bold;
+  color: #333;
+  font-size: 14px;
+}
+
+/* ส่วนของ Flights Schedule */
+.flights-schedule-container {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--vt-c-white);
+  border-radius: 10px;
+  padding: 35px;
+}
+
+.flights-schedule-header {
+  display: flex;
+  gap: 65px;
+}
+.flights-schedule-header .section-header {
+  margin-bottom: 0;
+}
+
+.section-header-icon {
+  display: flex;
+  gap: 30px;
+}
+
+.icon-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.line-domestic {
+  width: 45px;
+  height: 6px;
+  border-radius: 4px;
+  background-color: var(--c-light-blue);
+}
+
+.line-international {
+  width: 45px;
+  height: 6px;
+  border-radius: 4px;
   background-color: var(--c-orange);
+}
+
+.section-header-icon p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--vt-c-gray);
+}
+
+.flights-schedule-analysis {
+  position: relative;
+  height: 350px;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 8px;
 }
 
 @media (max-width: 1024px) {
