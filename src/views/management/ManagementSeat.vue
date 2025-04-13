@@ -276,6 +276,7 @@ const toggleStatusDropdown = () => {
 
 <style scoped>
 .management-seat {
+  margin: 20px;
   padding: 20px;
   background-color: var(--vt-c-white, #ffffff);
   border-radius: 10px;
