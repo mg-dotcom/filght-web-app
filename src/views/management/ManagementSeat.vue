@@ -1,7 +1,10 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import {
   seatData,
+  economySeats,
+  businessSeats,
+  firstClassSeats,
   getUniqueRows,
   formatSeatId,
   getSeatStatus,
@@ -10,15 +13,28 @@ import {
 } from "@/data/management-seat.js";
 
 const isStatusDropdownOpen = ref(false);
-const statusOptions = ref([
-  { id: 1, name: "Available" },
-  { id: 2, name: "Not Available" },
-]);
+
+const selectedClassTypeId = ref("economy");
 
 const toggleStatusDropdown = () => {
   isStatusDropdownOpen.value = !isStatusDropdownOpen.value;
-  console.log(statusOptions.value);
 };
+
+const selectClassType = (classTypeId) => {
+  selectedClassTypeId.value = classTypeId;
+};
+
+const seatsByClass = computed(() => {
+  if (selectedClassTypeId.value === "economy") return economySeats;
+  if (selectedClassTypeId.value === "business") return businessSeats;
+  if (selectedClassTypeId.value === "first-class") return firstClassSeats;
+  return [];
+});
+
+// ✅ แสดงแถวที่มีใน class นั้นๆ
+const rowsByClass = computed(() => {
+  return getUniqueRows(seatsByClass.value);
+});
 </script>
 
 <template>
@@ -183,7 +199,8 @@ const toggleStatusDropdown = () => {
             <div
               v-for="classType in seatData.classTypes"
               :key="classType.id"
-              :class="['class-type-btn', { active: classType.active }]"
+              :class="{ active: selectedClassTypeId === classType.id }"
+              @click="selectClassType(classType.id)"
             >
               {{ classType.name }}
             </div>
@@ -213,11 +230,7 @@ const toggleStatusDropdown = () => {
               </div>
             </div>
 
-            <div
-              class="seat-row"
-              v-for="rowNum in getUniqueRows()"
-              :key="rowNum"
-            >
+            <div class="seat-row" v-for="rowNum in rowsByClass" :key="rowNum">
               <div class="row-header">{{ rowNum }}</div>
 
               <div class="seat-grid-row">
@@ -241,12 +254,21 @@ const toggleStatusDropdown = () => {
                   <div
                     v-if="col !== ''"
                     class="seat"
-                    :class="getSeatStatus(formatSeatId(rowNum, col))"
-                    :title="getSeatInfo(formatSeatId(rowNum, col))"
+                    :class="
+                      getSeatStatus(seatsByClass, formatSeatId(rowNum, col))
+                    "
+                    :title="
+                      getSeatInfo(seatsByClass, formatSeatId(rowNum, col))
+                    "
                   >
                     <div class="seat-icon">
                       <img
-                        v-if="isSeatAvailable(formatSeatId(rowNum, col))"
+                        v-if="
+                          isSeatAvailable(
+                            seatsByClass,
+                            formatSeatId(rowNum, col)
+                          )
+                        "
                         src="/management-pic/management-seat/unreserve-seat-type.png"
                         alt="Unreserved Seat"
                       />
