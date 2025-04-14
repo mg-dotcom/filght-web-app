@@ -548,8 +548,8 @@ const updatedFlightsScheduleAnalysisData = {
   background-color: var(--vt-c-white);
   border-radius: 10px;
   padding: 35px;
-  overflow: visible; /* เพื่อให้เห็น pseudo-elements ที่เลยออกมา */
-  position: relative; /* เผื่อใช้กับ child ถ้าต้อง */
+  overflow: visible; 
+  position: relative; 
 }
 
 .bookings-list {
@@ -559,7 +559,7 @@ const updatedFlightsScheduleAnalysisData = {
 }
 
 .bookings-header {
-  position: relative; /* ต้องมีเพื่อให้ absolute ทำงาน */
+  position: relative; 
   color: var(--vt-c-gray);
   display: grid;
   grid-template-columns: 3fr 1fr;

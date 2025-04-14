@@ -31,7 +31,7 @@ const seatsByClass = computed(() => {
   return [];
 });
 
-// ✅ แสดงแถวที่มีใน class นั้นๆ
+// แสดงแถวที่มีใน class นั้นๆ
 const rowsByClass = computed(() => {
   return getUniqueRows(seatsByClass.value);
 });

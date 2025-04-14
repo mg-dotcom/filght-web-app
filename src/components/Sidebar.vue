@@ -6,7 +6,7 @@ const router = useRouter();
 
 const navItems = [
   { icon: "home", label: "Dashboard", path: "/dashboard" },
-  // temporarily for management-seat
+  // ใช้เป็นเพจหลักของ /management เป้น /management/seat ชั่วคราว
   { icon: "users", label: "Management", path: "/management/seat" },
   { icon: "file-text", label: "Reports", path: "/reports" },
   { icon: "settings", label: "Setting", path: "/settings" },
@@ -30,7 +30,7 @@ const activeUsers = [
 
 <template>
   <div class="sidebar">
-    <!-- Profile Section -->
+    <!-- Profile  -->
     <div class="profile-section">
       <div class="profile-container">
         <div class="profile-image">
