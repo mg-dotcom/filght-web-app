@@ -2,19 +2,20 @@
 import { ref, computed } from "vue";
 import {
   seatData,
-  economySeats,
-  businessSeats,
-  firstClassSeats,
+  economySeatsData,
+  businessSeatsData,
+  firstClassSeatsData,
   getUniqueRows,
-  formatSeatId,
   getSeatStatus,
   getSeatInfo,
   isSeatAvailable,
+  formatSelectedClassTypeId,
+  formatSeatId,
 } from "@/data/management-seat.js";
 
 const isStatusDropdownOpen = ref(false);
 
-const selectedClassTypeId = ref("economy");
+const selectedClassTypeId = ref("economy"); // Default to Economy class
 
 const toggleStatusDropdown = () => {
   isStatusDropdownOpen.value = !isStatusDropdownOpen.value;
@@ -22,12 +23,44 @@ const toggleStatusDropdown = () => {
 
 const selectClassType = (classTypeId) => {
   selectedClassTypeId.value = classTypeId;
+  clearSelectedSeat();
+};
+
+const clearSelectedSeat = () => {
+  selectedPassengerSeat.value = null;
+  isStatusDropdownOpen.value = false;
+};
+
+const selectedPassengerSeat = ref(null);
+
+const selectSeat = (rowNum, col) => {
+  const seatId = formatSeatId(rowNum, col);
+  const classType = formatSelectedClassTypeId(selectedClassTypeId.value);
+
+  const seat = seatsByClass.value.find(
+    (seat) => seat.id === seatId && seat.class === classType
+  );
+
+  if (!seat) return;
+
+  // ถ้าที่นั่งมีสถานะเป็น available = Unreserved ไม่สามารถเลือกได้
+  if (seat.status === "available") return;
+
+  // ถ้ากดที่นั่งเดิมซ้ำ = ยกเลิกการเลือก
+  if (selectedPassengerSeat.value?.id === seat.id) {
+    selectedPassengerSeat.value = null;
+  } else {
+    selectedPassengerSeat.value = seat;
+    console.log(
+      `Selected Seat: ${seat.id}, Class: ${classType}, Status: ${seat.status}, Checked In: ${seat.isCheckedIn}`
+    );
+  }
 };
 
 const seatsByClass = computed(() => {
-  if (selectedClassTypeId.value === "economy") return economySeats;
-  if (selectedClassTypeId.value === "business") return businessSeats;
-  if (selectedClassTypeId.value === "first-class") return firstClassSeats;
+  if (selectedClassTypeId.value === "economy") return economySeatsData;
+  if (selectedClassTypeId.value === "business") return businessSeatsData;
+  if (selectedClassTypeId.value === "first-class") return firstClassSeatsData;
   return [];
 });
 
@@ -156,12 +189,38 @@ const rowsByClass = computed(() => {
       </div>
 
       <div class="management-seat-container">
-        <div class="select-seat">
-          <div class="select-seat-header">Select Your Seat</div>
+        <div
+          :class="['select-seat', selectedPassengerSeat ? 'active' : 'default']"
+        >
+          <div class="select-seat-header">
+            <template v-if="selectedPassengerSeat">
+              <div>
+                Seat <strong>{{ selectedPassengerSeat.id }}</strong>
+              </div>
+              <button class="edit-btn">Edit</button>
+            </template>
+            <template v-else> Select Your Seat </template>
+          </div>
+
           <div class="select-seat-content">
-            <p>Show Passenger's Check-In Status</p>
+            <template v-if="selectedPassengerSeat">
+              <div class="status-line">
+                Check-In Status :
+                <span class="checked-in">
+                  {{
+                    selectedPassengerSeat.isCheckedIn === true
+                      ? "Checked In"
+                      : "Not Checked In"
+                  }}
+                </span>
+              </div>
+            </template>
+            <template v-else>
+              <p>Show Passenger's Check-In Status</p>
+            </template>
           </div>
         </div>
+
         <div class="type-seat">
           <div class="type reserve-seat">
             <img
@@ -210,19 +269,7 @@ const rowsByClass = computed(() => {
             <div class="seat-columns">
               <div
                 class="column-header"
-                v-for="col in [
-                  'A',
-                  'B',
-                  'C',
-                  '',
-                  'D',
-                  'E',
-                  'F',
-                  '',
-                  'G',
-                  'H',
-                  'I',
-                ]"
+                v-for="col in seatData.columns"
                 :key="'header-' + col"
                 :class="{ spacer: col === '' }"
               >
@@ -235,19 +282,7 @@ const rowsByClass = computed(() => {
 
               <div class="seat-grid-row">
                 <div
-                  v-for="col in [
-                    'A',
-                    'B',
-                    'C',
-                    '',
-                    'D',
-                    'E',
-                    'F',
-                    '',
-                    'G',
-                    'H',
-                    'I',
-                  ]"
+                  v-for="col in seatData.columns"
                   :key="`${rowNum}-${col || 'spacer'}`"
                   class="seat-container"
                 >
@@ -260,6 +295,7 @@ const rowsByClass = computed(() => {
                     :title="
                       getSeatInfo(seatsByClass, formatSeatId(rowNum, col))
                     "
+                    @click="selectSeat(rowNum, col)"
                   >
                     <div class="seat-icon">
                       <img
@@ -271,6 +307,14 @@ const rowsByClass = computed(() => {
                         "
                         src="/management-pic/management-seat/unreserve-seat-type.png"
                         alt="Unreserved Seat"
+                      />
+                      <img
+                        v-else-if="
+                          selectedPassengerSeat &&
+                          selectedPassengerSeat.id === formatSeatId(rowNum, col)
+                        "
+                        src="/management-pic/management-seat/passenger-seat-type.png"
+                        alt="Passenger Seat"
                       />
                       <img
                         v-else
@@ -580,14 +624,56 @@ const rowsByClass = computed(() => {
   flex-direction: column;
 }
 
+/* ก่อนเลือก */
+.select-seat.default {
+  border-color: #3b82a9;
+}
+
 .select-seat-header {
   background-color: var(--c-primary, #3e7ca3);
   color: var(--c-white, #ffffff);
   font-weight: 500;
-  padding: 10px;
+  padding: 12px 12px;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
 }
 
+.edit-btn {
+  display: none; /* ซ่อนไว้ก่อนเลือก */
+}
+
+/* หลังเลือก */
+.select-seat.active {
+  border-color: #f59e0b;
+}
+
+.select-seat.active .select-seat-header {
+  background-color: #f59e0b;
+  color: white;
+  padding: 12px 25px;
+  justify-content: space-between;
+}
+
+.select-seat.active .edit-btn {
+  display: inline-block;
+  background: transparent;
+  border: 1px solid white;
+  border-radius: 6px;
+  padding: 3px 10px;
+  color: white;
+  cursor: pointer;
+}
+
+.select-seat.active .edit-btn:hover {
+  background-color: white;
+  color: #f59e0b;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Content เหมือนเดิม */
 .select-seat-content {
   background-color: var(--c-white, #ffffff);
   font-size: 14px;
@@ -595,13 +681,20 @@ const rowsByClass = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 10px;
+  color: #5a6872;
 }
 
-.select-seat-content p {
-  color: #5a6872;
-  text-align: center;
-  font-weight: 400;
-  margin: 0;
+/* Status */
+
+.checked-in {
+  display: inline-block;
+  margin-left: 8px;
+  background-color: #fff7ed;
+  color: #f59e0b;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-weight: bold;
 }
 
 /* ส่วนของ type seat */
