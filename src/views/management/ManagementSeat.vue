@@ -15,7 +15,7 @@ import {
 
 const isStatusDropdownOpen = ref(false);
 
-const selectedClassTypeId = ref("economy"); // Default to Economy class
+const selectedClassTypeId = ref("economy");
 
 const toggleStatusDropdown = () => {
   isStatusDropdownOpen.value = !isStatusDropdownOpen.value;

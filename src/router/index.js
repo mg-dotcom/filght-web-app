@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Dashboard from "@/views/Dashboard.vue";
 import Management from "@/views/management/Management.vue";
 import ManagementSeat from "@/views/management/ManagementSeat.vue";
+import ManagementAirline from "@/views/management/ManagementAirline.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,6 +25,11 @@ const router = createRouter({
           path: "seat",
           name: "management-seat",
           component: ManagementSeat,
+        },
+        {
+          path: "airline",
+          name: "management-airline",
+          component: ManagementAirline,
         },
       ],
     },
