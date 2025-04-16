@@ -148,7 +148,7 @@ import { airlines } from "@/data/management-airline.js";
 
 .airline-main-content {
   border-right: 3px dashed var(--c-soft-blue);
-  position: relative; /* เพื่อให้ ::after อ้างอิงตำแหน่งจาก block นี้ */
+  position: relative;
 }
 
 /* ส่วนของ SECTION 1: Header styling */
@@ -247,6 +247,7 @@ import { airlines } from "@/data/management-airline.js";
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 15px 25px;
+  max-width: 700px; /* ปรับค่านี้ตามที่ต้องการ */
 }
 
 .info-item {
