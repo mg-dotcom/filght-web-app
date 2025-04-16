@@ -9,10 +9,18 @@ import { airlines } from "@/data/management-airline.js";
         v-for="(airline, index) in airlines"
         :key="index"
         class="airline-card"
+        :style="{
+          backgroundColor: airline.airlineColor,
+        }"
       >
         <!-- SECTION 1: Header -->
         <div class="card-section logo-section" style="grid-area: logo">
-          <div class="airline-logo">
+          <div
+            class="airline-logo"
+            :style="{
+              backgroundColor: airline.airlineColor,
+            }"
+          >
             <img
               src="/management-pic/management-airline/airplane-header-icon.png"
               alt="Airline Logo"
@@ -28,19 +36,9 @@ import { airlines } from "@/data/management-airline.js";
         </div>
 
         <div class="card-section status-section" style="grid-area: status">
-          <div class="airline-status">
-            <span
-              :class="{
-                'status-active': airline.status === 'Active',
-                'status-closed': airline.status === 'Temporarily Closed',
-              }"
-            >
-              {{ airline.status }}
-            </span>
-          </div>
+          <div class="airline-status">Status</div>
         </div>
 
-        <!-- Blank space in the grid -->
         <div class="blank-space" style="grid-area: blank-space"></div>
 
         <!-- SECTION 2: Main Content -->
@@ -48,27 +46,23 @@ import { airlines } from "@/data/management-airline.js";
           <div class="info-grid">
             <div class="info-item">
               <p class="info-label">Name</p>
-              <p class="info-value">{{ airline.name.split(" ")[0] }}</p>
+              <p class="info-value">{{ airline.name_short }}</p>
             </div>
-
-            <div class="info-item">
-              <p class="info-label">Country</p>
-              <p class="info-value">{{ airline.country }}</p>
-            </div>
-
             <div class="info-item">
               <p class="info-label">Code</p>
               <p class="info-value">{{ airline.code }}</p>
             </div>
-
-            <div class="info-item">
-              <p class="info-label">Contact</p>
-              <p class="info-value">{{ airline.contact }}</p>
-            </div>
-
             <div class="info-item info-item-hq">
               <p class="info-label">Headquarters</p>
               <p class="info-value">{{ airline.headquarters }}</p>
+            </div>
+            <div class="info-item">
+              <p class="info-label">Country</p>
+              <p class="info-value">{{ airline.country }}</p>
+            </div>
+            <div class="info-item">
+              <p class="info-label">Contact</p>
+              <p class="info-value">{{ airline.contact }}</p>
             </div>
           </div>
         </div>
@@ -76,21 +70,20 @@ import { airlines } from "@/data/management-airline.js";
         <!-- SECTION 3: Icon Area -->
         <div class="card-section airline-icon-section" style="grid-area: icon">
           <div class="airline-plane-icon">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              width="40"
-              height="40"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path
-                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
-              ></path>
-            </svg>
+            <img
+              v-if="airline.status === 'active'"
+              src="/management-pic/management-airline/airplane-active-icon.png"
+              alt=""
+            />
+            <div v-else-if="airline.status === 'temporarily_closed'">
+              <div class="status-closed">
+                <p>Temporarily Close</p>
+              </div>
+              <img
+                src="/management-pic/management-airline/airplane-inactive-icon.png"
+                alt=""
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -107,6 +100,7 @@ import { airlines } from "@/data/management-airline.js";
   width: 100%;
 }
 
+/* ส่วนของ airline card */
 .airline-cards {
   display: flex;
   flex-wrap: wrap;
@@ -116,7 +110,7 @@ import { airlines } from "@/data/management-airline.js";
 
 .airline-card {
   display: grid;
-  grid-template-columns: 100px 1fr 120px;
+  grid-template-columns: 135px 1fr 200px;
   grid-template-rows: auto auto;
   grid-template-areas:
     "logo title status"
@@ -125,49 +119,62 @@ import { airlines } from "@/data/management-airline.js";
   background-color: #f8f9fa;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   position: relative;
 }
 
-/* Common section styling */
+/* ส่วนของ common section */
 .card-section {
   position: relative;
 }
 
-/* Blank space styling */
+.title-section {
+  border-right: 3px dashed var(--c-soft-blue);
+}
+
+.title-section::after {
+  content: "";
+  position: absolute;
+  top: -12px;
+  right: -14px;
+  width: 25px;
+  height: 25px;
+  background-color: var(--c-soft-blue);
+  border-radius: 50%;
+}
+
 .blank-space {
   background-color: white;
 }
 
-/* SECTION 1: Header styling */
+.airline-main-content {
+  border-right: 3px dashed var(--c-soft-blue);
+  position: relative; /* เพื่อให้ ::after อ้างอิงตำแหน่งจาก block นี้ */
+}
+
+/* ส่วนของ SECTION 1: Header styling */
 .logo-section {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #ffaf40;
   height: 60px;
 }
 
 .title-section {
   display: flex;
   align-items: center;
-  background-color: #ffaf40;
   height: 60px;
   color: white;
 }
 
 .status-section {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
-  padding-right: 15px;
-  background-color: #ffaf40;
   height: 60px;
 }
 
 .airline-logo {
   border: 3px solid white;
-  background-color: #ffaf40;
   border-radius: 50%;
   position: relative;
   bottom: -12px;
@@ -206,41 +213,44 @@ import { airlines } from "@/data/management-airline.js";
 
 .airline-status {
   background-color: white;
-  padding: 5px 15px;
-  border-radius: 15px;
+  padding: 2px 25px;
+  border-radius: 8px;
   font-size: 12px;
   font-weight: 500;
 }
 
-.status-active {
-  color: #2c9e6a;
-}
-
-.status-closed {
-  color: #e74c3c;
-}
-
-/* SECTION 2: Main Content styling */
+/* ส่วนของ SECTION 2: Main Content styling */
 .airline-main-content {
-  padding: 25px 15px 15px 15px;
+  padding: 15px 0;
   background-color: white;
   position: relative;
   z-index: 1;
   min-height: 120px;
 }
 
+.airline-main-content::after {
+  content: "";
+  position: absolute;
+  bottom: -12px;
+  right: -14px;
+  width: 25px;
+  height: 25px;
+  background-color: var(--c-soft-blue);
+  border-radius: 50%;
+}
+
+.info-item-hq {
+  grid-column: 3;
+}
+
 .info-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 15px 25px;
 }
 
 .info-item {
   margin-bottom: 5px;
-}
-
-.info-item-hq {
-  grid-column: 1 / span 2;
 }
 
 .info-label {
@@ -255,30 +265,47 @@ import { airlines } from "@/data/management-airline.js";
   font-weight: 500;
 }
 
-/* SECTION 3: Icon Area styling */
+/* ส่วนของ SECTION 3: Icon Area styling */
 .airline-icon-section {
-  position: relative;
   background-color: white;
-  border-left: 1px dashed #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1;
 }
 
 .airline-plane-icon {
-  width: 80px;
-  height: 80px;
+  padding: 20px;
   background-color: #f0f0f4;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
-.airline-plane-icon svg {
-  width: 40px;
-  height: 40px;
+.status-closed {
+  background-color: var(--c-blue-tint);
+  padding: 5px 10px;
+  position: absolute;
+  border-radius: 8px;
+  color: white;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.status-closed p {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.airline-plane-icon img {
+  width: 60px;
+  height: 60px;
   color: #8c8c8c;
 }
 
@@ -288,10 +315,6 @@ import { airlines } from "@/data/management-airline.js";
     grid-template-areas:
       "logo title status"
       "blank-space main main";
-  }
-
-  .airline-main-content {
-    padding-right: 15px;
   }
 
   .airline-icon-section {

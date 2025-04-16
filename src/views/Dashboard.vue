@@ -588,7 +588,6 @@ const updatedFlightsScheduleAnalysisData = {
   right: -48px;
 }
 
-
 .booking-item {
   display: grid;
   position: relative;
