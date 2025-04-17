@@ -2,71 +2,40 @@
 import ManagementOverview from "@/components/ManagementOverview.vue";
 import { flightData } from "@/data/management-flight";
 import FlightPagination from "@/components/management-flight/FlightPagination.vue";
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 
+// ค่า tableHeaders สำหรับแสดงในตาราง
 const tableHeaders = [
-  { label: "SeatAvailable", filter: true, center: true },
-  { label: "Departure", filter: true },
-  { label: "", filter: false }, // ช่องว่าง
-  { label: "Destination", filter: true },
-  { label: "Date", filter: true },
-  { label: "Aircraft", filter: true },
-  { label: "Status", filter: true },
-  { label: "Action", filter: false },
+  {
+    label: "SeatAvailable",
+    key: "isSeatAvailable",
+    filter: true,
+    center: true,
+  },
+  { label: "Departure", key: "departure.airport", filter: true },
+  { label: "", key: null, filter: false },
+  { label: "Destination", key: "destination.airport", filter: true },
+  { label: "Date", key: "date", filter: true },
+  { label: "Aircraft", key: "aircraft", filter: true },
+  { label: "Status", key: "status", filter: true },
+  { label: "Action", key: null, filter: false },
 ];
 
 const paginatedFlights = ref([]);
 
-const updatePaginatedFlights = (flights) => {
-  paginatedFlights.value = flights;
+// เอาค่า property ที่อยู่ใน object มาใช้
+const getNestedValue = (obj, path) => {
+  return path.split(".").reduce((o, key) => (o ? o[key] : null), obj);
 };
 
-onMounted(() => {
-  paginatedFlights.value = flightData.slice(0, 6);
-});
-
-const sortOrder = ref({});
-
-const filterHeader = (headerLabel) => {
-  // สร้างการจับคู่ระหว่างป้ายกำกับหัวตารางกับคุณสมบัติข้อมูลที่เกี่ยวข้อง
-  const filterMap = {
-    SeatAvailable: "isSeatAvailable",
-    Departure: "departure.airport",
-    Destination: "destination.airport",
-    Date: "date",
-    Aircraft: "aircraft",
-    Status: "status",
-  };
-
-  // ดึง property ที่ต้องการกรอง
-  const property = filterMap[headerLabel];
-
-  if (!property) return;
-
-  // กำหนดการเรียงลำดับเริ่มต้นหากยังไม่ได้ตั้งค่า หรือสลับระหว่างการเรียงจากน้อยไปมาก/มากไปน้อย/ไม่เรียง
-  if (!sortOrder.value[property]) {
-    sortOrder.value[property] = "asc";
-  } else if (sortOrder.value[property] === "asc") {
-    sortOrder.value[property] = "desc";
-  } else {
-    sortOrder.value[property] = "asc";
-  }
-
-  const currentOrder = sortOrder.value[property];
-
-  // เรียงลำดับตามลำดับปัจจุบัน
-  const sorted = [...flightData].sort((a, b) => {
-    const getNestedValue = (obj, path) => {
-      return path
-        .split(".")
-        .reduce((prev, curr) => (prev ? prev[curr] : null), obj);
-    };
-
+const sortByProperty = (data, property, order) => {
+  return [...data].sort((a, b) => {
     const valueA = getNestedValue(a, property);
     const valueB = getNestedValue(b, property);
 
+    // ถ้าเป็น boolean ให้เปรียบเทียบค่า true/false
     if (typeof valueA === "boolean") {
-      return currentOrder === "asc"
+      return order === "asc"
         ? valueA === valueB
           ? 0
           : valueA
@@ -79,17 +48,42 @@ const filterHeader = (headerLabel) => {
         : -1;
     }
 
+    // ถ้าเป็น string ให้ใช้ localeCompare สำหรับการเปรียบเทียบ
     if (typeof valueA === "string") {
-      return currentOrder === "asc"
+      return order === "asc"
         ? valueA.localeCompare(valueB)
         : valueB.localeCompare(valueA);
     }
 
-    return currentOrder === "asc" ? valueA - valueB : valueB - valueA;
+    // ถ้าเป็น number ให้เปรียบเทียบค่าตรงๆ
+    return order === "asc" ? valueA - valueB : valueB - valueA;
   });
+};
 
-  // อัปเดตรายการเที่ยวบินแบบแบ่งหน้าด้วยผลลัพธ์ที่เรียงลำดับหน้าแรก
-  paginatedFlights.value = sorted.slice(0, 6);
+const sortOrder = ref({});
+
+const filterHeader = (headerLabel) => {
+  const header = tableHeaders.find((h) => h.label === headerLabel);
+  const property = header?.key;
+  if (!property) return;
+
+  // กดที่ sort ครั้งแรกจะ sort ขึ้น asc
+  // กดที่ sort ครั้งที่สองจะ sort ลง desc
+  // กดที่ sort ครั้งที่สามจะ sort ขึ้น asc ใหม่อีกครั้ง [Toggle]
+  sortOrder.value[property] =
+    sortOrder.value[property] === "asc" ? "desc" : "asc";
+
+  const order = sortOrder.value[property];
+  // example: sortByProperty(flightData, "departure.airport" // property ที่่กดจาก header sort icon , "asc")
+  const sortedData = sortByProperty(flightData, property, order);
+  paginatedFlights.value = sortedData.slice(0, paginatedFlights.value.length);
+};
+
+// เป็นการส่งค่าจาก child component ไปยัง parent component 
+// เพื่อให้ parent component สามารถอัพเดทข้อมูลได้ จากการกดเปลี่ยนหน้าเเต่ละครั้ง ข้อมูลจะถูกส่งไปที่ parent component
+// ex. กด next page จะส่งข้อมูลเที่ยวบินที่อยู่ในหน้าที่ 2 ไปที่ parent component
+const updatePaginatedFlights = (flights) => {
+  paginatedFlights.value = flights;
 };
 </script>
 
@@ -530,7 +524,6 @@ const filterHeader = (headerLabel) => {
   animation: plane-move 4s infinite linear;
 }
 
-/* Animation */
 @keyframes plane-move {
   0% {
     transform: translateY(-50%) translateX(0);
@@ -675,7 +668,6 @@ const filterHeader = (headerLabel) => {
   color: white;
 }
 
-/* Responsive Layout Adjustments */
 @media (max-width: 992px) {
   .flight-table-header,
   .flight-row {
@@ -685,7 +677,7 @@ const filterHeader = (headerLabel) => {
 
 @media (max-width: 768px) {
   .flight-table-header {
-    display: none; /* Hide headers on mobile */
+    display: none;
   }
 
   .flight-row {
