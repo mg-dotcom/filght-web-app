@@ -7,7 +7,7 @@ const router = useRouter();
 const navItems = [
   { icon: "home", label: "Dashboard", path: "/dashboard" },
   // ใช้เป็นเพจหลักของ /management เป้น /management/seat ชั่วคราว
-  { icon: "users", label: "Management", path: "/management/seat" },
+  { icon: "users", label: "Management", path: "/management/menu" },
   { icon: "file-text", label: "Reports", path: "/reports" },
   { icon: "settings", label: "Setting", path: "/settings" },
 ];

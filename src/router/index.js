@@ -4,6 +4,7 @@ import Management from "@/views/management/Management.vue";
 import ManagementSeat from "@/views/management/ManagementSeat.vue";
 import ManagementAirline from "@/views/management/ManagementAirline.vue";
 import ManagementFlight from "@/views/management/ManagementFlight.vue";
+import ManagementMenu from "@/views/management/ManagementMenu.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,6 +23,11 @@ const router = createRouter({
       name: "management",
       component: Management,
       children: [
+        {
+          path: "menu",
+          name: "management-menu",
+          component: ManagementMenu,
+        },
         {
           path: "seat",
           name: "management-seat",
