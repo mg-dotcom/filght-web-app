@@ -1,3 +1,94 @@
+<script setup>
+import { useFlightStore } from "@/stores/flightStore";
+import { ref, computed, watch, defineEmits, onMounted } from "vue";
+
+const emit = defineEmits(["update:paginatedData"]);
+const flightStore = useFlightStore();
+const itemsPerPage = 6;
+const currentPage = ref(1);
+const flightData = computed(() => flightStore.getAllFlights);
+
+onMounted(() => {
+  if (flightStore.getTotalFlights === 0) {
+    flightStore.loadFlights();
+    setTimeout(() => {
+      emit("update:paginatedData", paginatedFlights.value);
+    }, 0);
+  } else {
+    emit("update:paginatedData", paginatedFlights.value);
+  }
+});
+
+//  คำนวณจำนวนหน้าทั้งหมด = จำนวนเที่ยวบิน ÷ จำนวนรายการต่อหน้า
+//  flightStore.getTotalFlights = 12, itemsPerPage = 6, totalPages = 2
+const totalPages = computed(() =>
+  Math.ceil(flightStore.getTotalFlights / itemsPerPage)
+);
+
+//  คำนวณเที่ยวบินที่จะแสดงในหน้าปัจจุบัน
+// [index] = 0-5, 6-11, 12-17, ...
+const paginatedFlights = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return flightData.value.slice(start, end);
+});
+
+// คำนวณว่าจะแสดงเลขหน้าไหนบ้าง
+// ถ้าหน้าแรกหรือหน้าสุดท้ายให้แสดงเลขหน้า 1-3 หรือ 2-4
+const displayedPages = computed(() => {
+  const pages = [];
+  let startPage = Math.max(1, currentPage.value - 1); // เริ่มจากหน้าปัจจุบัน - 1 แต่ไม่น้อยกว่า 1
+  let endPage = Math.min(totalPages.value, currentPage.value + 1); // จบที่หน้าปัจจุบัน + 1 แต่ไม่เกินหน้าสุดท้าย
+
+  if (endPage - startPage + 1 < 3) {
+    if (startPage === 1) {
+      endPage = Math.min(3, totalPages.value);
+    } else if (endPage === totalPages.value) {
+      startPage = Math.max(1, totalPages.value - 2);
+    }
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i);
+  }
+  return pages;
+});
+
+// จะแสดงจุดไข่ปลา (...) เมื่อมีจำนวนหน้ามากกว่า 5 หน้า และไม่ได้อยู่ในช่วง 3 หน้าสุดท้าย
+const showEllipsis = computed(() => {
+  return totalPages.value > 5 && currentPage.value < totalPages.value - 2;
+});
+
+function goToPage(page) {
+  currentPage.value = page;
+  emit("update:paginatedData", paginatedFlights.value);
+}
+
+function goToPrevPage() {
+  if (currentPage.value > 1) {
+    goToPage(currentPage.value - 1);
+  }
+}
+
+function goToNextPage() {
+  if (currentPage.value < totalPages.value) {
+    goToPage(currentPage.value + 1);
+  }
+}
+
+function goToFirstPage() {
+  goToPage(1);
+}
+
+function goToLastPage() {
+  goToPage(totalPages.value);
+}
+
+watch(currentPage, () => {
+  emit("update:paginatedData", paginatedFlights.value);
+});
+</script>
+
 <template>
   <div class="pagination-container">
     <button
@@ -91,89 +182,6 @@
     </button>
   </div>
 </template>
-
-<script setup>
-import { ref, computed, watch, defineEmits } from "vue";
-import { flightData } from "@/data/management-flight";
-
-const emit = defineEmits(["update:paginatedData"]);
-
-const itemsPerPage = 6;
-const currentPage = ref(1);
-
-//  คำนวณจำนวนหน้าทั้งหมด = จำนวนเที่ยวบิน ÷ จำนวนรายการต่อหน้า
-//  flightData.length = 12, itemsPerPage = 6, totalPages = 2
-const totalPages = computed(() => Math.ceil(flightData.length / itemsPerPage));
-
-//  คำนวณเที่ยวบินที่จะแสดงในหน้าปัจจุบัน
-// [index] = 0-5, 6-11, 12-17, ...
-const paginatedFlights = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return flightData.slice(start, end);
-});
-
-// คำนวณว่าจะแสดงเลขหน้าไหนบ้าง
-// ถ้าหน้าแรกหรือหน้าสุดท้ายให้แสดงเลขหน้า 1-3 หรือ 2-4
-const displayedPages = computed(() => {
-  const pages = [];
-  let startPage = Math.max(1, currentPage.value - 1); // เริ่มจากหน้าปัจจุบัน - 1 แต่ไม่น้อยกว่า 1
-  let endPage = Math.min(totalPages.value, currentPage.value + 1); // จบที่หน้าปัจจุบัน + 1 แต่ไม่เกินหน้าสุดท้าย
-
-  if (endPage - startPage + 1 < 3) {
-    if (startPage === 1) {
-      endPage = Math.min(3, totalPages.value);
-    } else if (endPage === totalPages.value) {
-      startPage = Math.max(1, totalPages.value - 2);
-    }
-  }
-
-  for (let i = startPage; i <= endPage; i++) {
-    pages.push(i);
-  }
-  return pages;
-});
-
-// จะแสดงจุดไข่ปลา (...) เมื่อมีจำนวนหน้ามากกว่า 5 หน้า และไม่ได้อยู่ในช่วง 3 หน้าสุดท้าย
-const showEllipsis = computed(() => {
-  return totalPages.value > 5 && currentPage.value < totalPages.value - 2;
-});
-
-function goToPage(page) {
-  currentPage.value = page;
-  console.log("Current Page:", currentPage.value);
-  console.log("Paginated Flights:", paginatedFlights.value);
-  emit("update:paginatedData", paginatedFlights.value);
-}
-
-function goToPrevPage() {
-  if (currentPage.value > 1) {
-    goToPage(currentPage.value - 1);
-  }
-}
-
-function goToNextPage() {
-  if (currentPage.value < totalPages.value) {
-    goToPage(currentPage.value + 1);
-  }
-}
-
-function goToFirstPage() {
-  goToPage(1);
-}
-
-function goToLastPage() {
-  goToPage(totalPages.value);
-}
-
-watch(
-  currentPage,
-  () => {
-    emit("update:paginatedData", paginatedFlights.value);
-  },
-  { immediate: true }
-);
-</script>
 
 <style scoped>
 .pagination-container {

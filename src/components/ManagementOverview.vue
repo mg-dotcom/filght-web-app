@@ -1,4 +1,13 @@
-<script setup></script>
+<script setup>
+import { defineProps } from "vue";
+
+defineProps({
+  showModal: {
+    type: Boolean,
+    default: false,
+  },
+});
+</script>
 
 <template>
   <div class="management">

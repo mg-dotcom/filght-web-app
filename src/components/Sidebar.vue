@@ -9,14 +9,12 @@ const navItems = [
   // ใช้เป็นเพจหลักของ /management เป้น /management/seat ชั่วคราว
   { icon: "users", label: "Management", path: "/management/menu" },
   { icon: "file-text", label: "Reports", path: "/reports" },
-  { icon: "settings", label: "Setting", path: "/settings" },
 ];
 
 const iconMap = {
   home: "/dashboard-pic/icons/dashboard-icon.svg",
   users: "/dashboard-pic/icons/management-icon.svg",
   "file-text": "/dashboard-pic/icons/reports-icon.svg",
-  settings: "/dashboard-pic/icons/settings-icon.svg",
   logout: "/dashboard-pic/icons/logout-icon.svg",
 };
 

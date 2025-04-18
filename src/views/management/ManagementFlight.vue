@@ -1,10 +1,12 @@
 <script setup>
 import ManagementOverview from "@/components/ManagementOverview.vue";
-import { flightData } from "@/data/management-flight";
 import FlightPagination from "@/components/management-flight/FlightPagination.vue";
-import { ref } from "vue";
+import ModalAddFlight from "@/components/management-flight/ModalAddFlight.vue";
+import { ref, computed, onMounted } from "vue";
+import { useFlightStore } from "@/stores/flightStore";
 
-// ค่า tableHeaders สำหรับแสดงในตาราง
+const flightStore = useFlightStore();
+const flightData = computed(() => flightStore.getAllFlights);
 const tableHeaders = [
   {
     label: "SeatAvailable",
@@ -20,7 +22,14 @@ const tableHeaders = [
   { label: "Status", key: "status", filter: true },
   { label: "Action", key: null, filter: false },
 ];
+const showModal = ref(false);
 
+// โหลดข้อมูลเที่ยวบินเมื่อ component ถูก mount
+onMounted(() => {
+  flightStore.loadFlights();
+});
+
+// ส่วนของ pageination เเละ sort data
 const paginatedFlights = ref([]);
 
 // เอาค่า property ที่อยู่ใน object มาใช้
@@ -75,20 +84,32 @@ const filterHeader = (headerLabel) => {
 
   const order = sortOrder.value[property];
   // example: sortByProperty(flightData, "departure.airport" // property ที่่กดจาก header sort icon , "asc")
-  const sortedData = sortByProperty(flightData, property, order);
+  const sortedData = sortByProperty(flightData.value, property, order);
   paginatedFlights.value = sortedData.slice(0, paginatedFlights.value.length);
 };
 
-// เป็นการส่งค่าจาก child component ไปยัง parent component 
+// เป็นการส่งค่าจาก child component ไปยัง parent component
 // เพื่อให้ parent component สามารถอัพเดทข้อมูลได้ จากการกดเปลี่ยนหน้าเเต่ละครั้ง ข้อมูลจะถูกส่งไปที่ parent component
 // ex. กด next page จะส่งข้อมูลเที่ยวบินที่อยู่ในหน้าที่ 2 ไปที่ parent component
 const updatePaginatedFlights = (flights) => {
   paginatedFlights.value = flights;
 };
+
+const showModalAddFlight = () => {
+  showModal.value = true;
+};
+
+const addFlight = (newFlight) => {
+  // flightStore.addFlight(newFlight);
+  // showModal.value = false;
+  // // รีเฟรชข้อมูลเที่ยวบินหลังจากเพิ่มเที่ยวบินใหม่
+  // flightStore.loadFlights();
+  console.log("New Flight Data:", newFlight);
+};
 </script>
 
 <template>
-  <ManagementOverview>
+  <ManagementOverview :showModal="showModal">
     <!-- ฝั่งซ้ายของ header -->
     <template #header-left>
       <div class="section-header">
@@ -108,7 +129,9 @@ const updatePaginatedFlights = (flights) => {
         </div>
 
         <div class="status-selector">
-          <button class="status-button">Add +</button>
+          <button class="status-button" @click="showModalAddFlight">
+            Add +
+          </button>
         </div>
       </div>
     </template>
@@ -263,6 +286,11 @@ const updatePaginatedFlights = (flights) => {
       <FlightPagination @update:paginatedData="updatePaginatedFlights" />
     </template>
   </ManagementOverview>
+  <ModalAddFlight
+    :showModal="showModal"
+    @close="showModal = false"
+    @addFlight="addFlight"
+  ></ModalAddFlight>
 </template>
 
 <style scoped>
