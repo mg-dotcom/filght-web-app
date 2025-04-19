@@ -10,36 +10,38 @@ const isShowModalAddAirline = ref(false);
 const addFlight = (airline) => {
   isShowModalAddAirline.value = false;
 };
+
+const showModalAddAirline = () => {
+  isShowModalAddAirline.value = true;
+};
 </script>
 
 <template>
   <div class="management-airline">
-    <div class="airline-header">
-      <div class="controls">
-        <div class="search-container">
-          <div class="search-icon">
-            <img src="/search-input.svg" alt="" />
+    <header class="management-header">
+      <div class="header-left">Airline management</div>
+      <div class="header-right">
+        <div class="controls">
+          <div class="search-container">
+            <div class="search-icon">
+              <img src="/search-input.svg" alt="" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search Admin"
+              class="search-input"
+            />
           </div>
-          <input type="text" placeholder="Search Flight" class="search-input" />
-        </div>
-        <Dropdown v-model="status" :statusOptions="statusOptions">
-          <template #trigger="{ selected }">
-            <span
-              :class="['badge', selected?.value?.toLowerCase()]"
-              v-if="selected"
-            >
-              {{ selected.label }}
-            </span>
-            <span v-else>Select Status</span>
-          </template>
-        </Dropdown>
-        <div class="status-selector">
-          <button class="status-button" @click="showModalAddFlight">
-            Add +
-          </button>
+
+          <div class="status-selector">
+            <button class="status-button" @click="showModalAddAirline">
+              Add +
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </header>
+
     <div class="airline-cards">
       <div
         v-for="(airline, index) in airlines"
@@ -369,8 +371,32 @@ const addFlight = (airline) => {
   color: #8c8c8c;
 }
 
-
 /* Control Section - Search and Buttons */
+
+.management-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.header-left,
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.header-left {
+  flex: 1;
+  font-size: 2.5rem;
+  font-weight: 600;
+}
+
+.header-right {
+  justify-content: flex-end;
+}
 .controls {
   display: flex;
   gap: 15px;

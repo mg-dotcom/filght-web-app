@@ -1,7 +1,7 @@
 <script setup>
 import { ref, defineProps, defineEmits, onMounted, onBeforeUnmount } from "vue";
 import ModalConfirm from "../ModalConfirm.vue";
-import Dropdown from "../Dropdown.vue";
+import Dropdown from "@/components/Dropdown.vue";
 
 const emit = defineEmits(["addFlight", "close"]);
 const isShowConfirmModal = ref(false);
@@ -20,24 +20,19 @@ defineProps({
 const mode = ref("");
 
 const statusOptions = [
-  { value: "Pending", label: "Pending" },
-  { value: "Delayed", label: "Delayed" },
-  { value: "Completed", label: "Completed" },
-  { value: "Canceled", label: "Canceled" },
+  { value: "open", label: "Open" },
+  { value: "temporarily-closed", label: "Temporarily closed" },
 ];
 
 // form data
-const from = ref("");
-const departureDate = ref("");
-const departureTime = ref("");
+const airlineName = ref("");
+const code = ref("");
 
-const to = ref("");
-const arrivalDate = ref("");
-const arrivalTime = ref("");
+const contactPrefix = ref("");
+const contactNumber = ref("");
 
-const aircraft = ref("");
-const stop = ref(0);
-const duration = ref(0);
+const country = ref("");
+const headquarters = ref("");
 
 const status = ref("");
 
@@ -95,7 +90,7 @@ const closeModal = () => {
     >
       <div class="modal-content">
         <div>
-          <div class="modal-add-flight">
+          <div class="modal-add-airline">
             <div class="modal-header">
               <div class="modal-action">
                 <div @click="confirmAddFlight" class="check-button">
@@ -143,7 +138,7 @@ const closeModal = () => {
                   </svg>
                 </div>
               </div>
-              <h2>Add Flight Details</h2>
+              <h2>Add Airline Details</h2>
               <Dropdown v-model="status" :statusOptions="statusOptions">
                 <template #trigger="{ selected }">
                   <span
@@ -157,59 +152,113 @@ const closeModal = () => {
               </Dropdown>
             </div>
 
-            <div class="form-container">
-              <div class="form-row">
-                <label>From</label>
-                <label>Departure</label>
-                <label>Time</label>
+            <div class="pic-detail">
+              <div class="profile-pic-wrapper">
+                <div class="pic-container">
+                  <div class="pic"></div>
+                </div>
+                <div class="pic-edit">
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 32 32"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="16"
+                      cy="16"
+                      r="15.25"
+                      fill="#DDE9EF"
+                      stroke="#397499"
+                      stroke-width="1.5"
+                    />
+                    <path
+                      d="M10.0458 22.1623L10.4866 21.5555L10.4866 21.5555L10.0458 22.1623ZM9.21619 21.3327L8.60942 21.7735L8.60942 21.7735L9.21619 21.3327ZM20.4542 22.1623L20.0134 21.5555L20.0134 21.5555L20.4542 22.1623ZM21.2838 21.3327L20.6771 20.8918L20.6771 20.8918L21.2838 21.3327ZM9.21619 10.9243L8.60942 10.4834L8.60942 10.4834L9.21619 10.9243ZM10.0458 10.0947L10.4866 10.7014L10.4866 10.7014L10.0458 10.0947ZM13.759 10.1338C14.1732 10.1289 14.5049 9.78908 14.4999 9.3749C14.495 8.96071 14.1552 8.62898 13.741 8.63394L13.759 10.1338ZM22.7445 17.6375C22.7495 17.2233 22.4178 16.8835 22.0036 16.8785C21.5894 16.8736 21.2496 17.2053 21.2446 17.6195L22.7445 17.6375ZM15.8482 19.1318L15.7653 18.3864L15.8482 19.1318ZM12.7583 18.9087L12.228 19.439L12.228 19.439L12.7583 18.9087ZM12.5352 15.8189L13.2806 15.9017L12.5352 15.8189ZM13.3956 14.0289L12.8652 13.4985L12.8652 13.4985L13.3956 14.0289ZM12.7322 14.8118L12.0562 14.4869L12.0562 14.4869L12.7322 14.8118ZM17.6382 18.2715L18.1685 18.8018L18.1685 18.8018L17.6382 18.2715ZM16.8553 18.9348L17.1801 19.6108L17.1801 19.6108L16.8553 18.9348ZM15.25 22.8785V22.1285C13.8271 22.1285 12.8202 22.1275 12.0437 22.0433C11.2812 21.9607 10.8304 21.8053 10.4866 21.5555L10.0458 22.1623L9.60497 22.7691C10.247 23.2355 10.9921 23.4382 11.8822 23.5346C12.7582 23.6295 13.8606 23.6285 15.25 23.6285V22.8785ZM8.5 16.1285H7.75C7.75 17.5179 7.74897 18.6203 7.84389 19.4963C7.94032 20.3864 8.14296 21.1315 8.60942 21.7735L9.21619 21.3327L9.82295 20.8918C9.57323 20.5481 9.41777 20.0972 9.33516 19.3348C9.25103 18.5582 9.25 17.5513 9.25 16.1285H8.5ZM10.0458 22.1623L10.4866 21.5555C10.232 21.3705 10.008 21.1465 9.82295 20.8918L9.21619 21.3327L8.60942 21.7735C8.88698 22.1555 9.22294 22.4915 9.60497 22.7691L10.0458 22.1623ZM15.25 22.8785V23.6285C16.6394 23.6285 17.7418 23.6295 18.6178 23.5346C19.5079 23.4382 20.253 23.2355 20.895 22.7691L20.4542 22.1623L20.0134 21.5555C19.6696 21.8053 19.2187 21.9607 18.4563 22.0433C17.6798 22.1275 16.6729 22.1285 15.25 22.1285V22.8785ZM21.2838 21.3327L20.6771 20.8918C20.492 21.1465 20.268 21.3705 20.0134 21.5555L20.4542 22.1623L20.895 22.7691C21.2771 22.4915 21.613 22.1555 21.8906 21.7735L21.2838 21.3327ZM8.5 16.1285H9.25C9.25 14.7056 9.25103 13.6987 9.33516 12.9222C9.41777 12.1597 9.57323 11.7088 9.82295 11.3651L9.21619 10.9243L8.60942 10.4834C8.14296 11.1255 7.94032 11.8705 7.84389 12.7606C7.74897 13.6367 7.75 14.739 7.75 16.1285H8.5ZM10.0458 10.0947L9.60497 9.48791C9.22294 9.76546 8.88698 10.1014 8.60942 10.4834L9.21619 10.9243L9.82295 11.3651C10.008 11.1104 10.232 10.8865 10.4866 10.7014L10.0458 10.0947ZM13.75 9.38389L13.741 8.63394C11.9304 8.65565 10.6195 8.75078 9.60497 9.48791L10.0458 10.0947L10.4866 10.7014C11.0569 10.2871 11.8741 10.1564 13.759 10.1338L13.75 9.38389ZM21.9946 17.6285L21.2446 17.6195C21.2221 19.5044 21.0913 20.3216 20.6771 20.8918L21.2838 21.3327L21.8906 21.7735C22.6277 20.7589 22.7228 19.4481 22.7445 17.6375L21.9946 17.6285ZM21.667 14.2426L21.1367 13.7123L17.1079 17.7412L17.6382 18.2715L18.1685 18.8018L22.1974 14.773L21.667 14.2426ZM13.3956 14.0289L13.9259 14.5592L17.9547 10.5303L17.4244 10L16.8941 9.46967L12.8652 13.4985L13.3956 14.0289ZM15.8482 19.1318L15.7653 18.3864C14.882 18.4846 14.3007 18.5473 13.8736 18.5335C13.4666 18.5204 13.35 18.4397 13.2887 18.3784L12.7583 18.9087L12.228 19.439C12.6764 19.8875 13.2447 20.014 13.8252 20.0327C14.3855 20.0508 15.0943 19.9702 15.931 19.8772L15.8482 19.1318ZM12.5352 15.8189L11.7898 15.7361C11.6968 16.5728 11.6162 17.2815 11.6343 17.8419C11.6531 18.4223 11.7796 18.9906 12.228 19.439L12.7583 18.9087L13.2887 18.3784C13.2273 18.317 13.1467 18.2004 13.1335 17.7934C13.1198 17.3663 13.1825 16.785 13.2806 15.9017L12.5352 15.8189ZM13.3956 14.0289L12.8652 13.4985C12.5329 13.8308 12.235 14.1149 12.0562 14.4869L12.7322 14.8118L13.4082 15.1367C13.4507 15.0481 13.5213 14.9638 13.9259 14.5592L13.3956 14.0289ZM12.5352 15.8189L13.2806 15.9017C13.3438 15.333 13.3656 15.2252 13.4082 15.1367L12.7322 14.8118L12.0562 14.4869C11.8775 14.8588 11.8417 15.269 11.7898 15.7361L12.5352 15.8189ZM17.6382 18.2715L17.1079 17.7412C16.7032 18.1458 16.6189 18.2163 16.5304 18.2589L16.8553 18.9348L17.1801 19.6108C17.5521 19.4321 17.8362 19.1341 18.1685 18.8018L17.6382 18.2715ZM15.8482 19.1318L15.931 19.8772C16.3981 19.8253 16.8082 19.7896 17.1801 19.6108L16.8553 18.9348L16.5304 18.2589C16.4418 18.3014 16.3341 18.3232 15.7653 18.3864L15.8482 19.1318ZM21.667 10L21.1367 10.5303C21.6517 11.0453 21.9835 11.3793 22.1958 11.6576C22.3949 11.9186 22.417 12.0406 22.417 12.1213H23.167H23.917C23.917 11.5807 23.6892 11.1421 23.3883 10.7477C23.1006 10.3707 22.6824 9.95468 22.1974 9.46967L21.667 10ZM21.667 14.2426L22.1974 14.773C22.6824 14.288 23.1006 13.872 23.3883 13.4949C23.6892 13.1005 23.917 12.6619 23.917 12.1213H23.167H22.417C22.417 12.2021 22.3949 12.3241 22.1958 12.585C21.9835 12.8633 21.6517 13.1973 21.1367 13.7123L21.667 14.2426ZM21.667 10L22.1974 9.46967C21.7124 8.98466 21.2964 8.56643 20.9193 8.27873C20.5249 7.97783 20.0863 7.75 19.5457 7.75V8.5V9.25C19.6265 9.25 19.7485 9.27217 20.0094 9.47127C20.2877 9.68357 20.6217 10.0153 21.1367 10.5303L21.667 10ZM17.4244 10L17.9547 10.5303C18.4697 10.0153 18.8037 9.68357 19.082 9.47127C19.343 9.27217 19.465 9.25 19.5457 9.25V8.5V7.75C19.0051 7.75 18.5665 7.97783 18.1721 8.27873C17.7951 8.56643 17.3791 8.98466 16.8941 9.46967L17.4244 10ZM21.667 14.2426L22.1974 13.7123L17.9547 9.46967L17.4244 10L16.8941 10.5303L21.1367 14.773L21.667 14.2426Z"
+                      fill="#397499"
+                    />
+                  </svg>
+                </div>
               </div>
 
-              <div class="form-row inputs">
-                <input type="text" placeholder="- - -" v-model="from" />
-                <input type="date" v-model="departureDate" />
-                <input type="time" v-model="departureTime" />
-              </div>
+              <div class="form-container">
+                <div
+                  class="form-row"
+                  style="
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                    align-items: center;
+                  "
+                >
+                  <label>Airline Name</label>
+                  <label>Code</label>
+                </div>
 
-              <div class="form-row">
-                <label>To</label>
-                <label>Arrival</label>
-                <label>Time</label>
-              </div>
+                <div
+                  class="form-row inputs"
+                  style="
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                    align-items: center;
+                  "
+                >
+                  <input
+                    type="text"
+                    placeholder="Enter Airline Name"
+                    v-model="airlineName"
+                  />
+                  <input type="text" placeholder="- -" v-model="code" />
+                </div>
 
-              <div class="form-row inputs">
-                <input type="text" placeholder="- - -" v-model="to" />
-                <input type="date" v-model="arrivalDate" />
-                <input type="time" v-model="arrivalTime" />
-              </div>
+                <div
+                  class="form-row"
+                  style="
+                    grid-template-columns: 0.5fr 1fr 2fr;
+                    gap: 20px;
+                    align-items: center;
+                  "
+                >
+                  <label>Contact</label>
+                  <label style="grid-column: 3">Country</label>
+                </div>
 
-              <div
-                class="form-row"
-                style="
-                  grid-template-columns: 2fr 0.5fr 0.5fr;
-                  gap: 20px;
-                  align-items: center;
-                "
-              >
-                <label>Aircraft</label>
-                <label>Stop</label>
-                <label>Duration</label>
-              </div>
+                <div
+                  class="form-row inputs"
+                  style="
+                    grid-template-columns: 0.5fr 1fr 2fr;
+                    gap: 20px;
+                    align-items: center;
+                  "
+                >
+                  <input
+                    type="text"
+                    placeholder="+66"
+                    v-model="contactPrefix"
+                  />
+                  <input
+                    type="text"
+                    placeholder="12345678"
+                    v-model="contactNumber"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Enter Country"
+                    v-model="country"
+                  />
+                </div>
 
-              <div
-                class="form-row inputs"
-                style="
-                  grid-template-columns: 2fr 0.5fr 0.5fr;
-                  gap: 20px;
-                  align-items: center;
-                "
-              >
-                <input
-                  type="text"
-                  placeholder="Boeing 123-456"
-                  v-model="aircraft"
-                />
-                <input type="number" placeholder="- -" v-model="stop" />
-                <input type="number" placeholder="- -" v-model="duration" />
+                <div class="form-row">
+                  <label>Headquarters</label>
+                </div>
+
+                <div class="form-row inputs">
+                  <input
+                    style="grid-column: span 3"
+                    type="text"
+                    placeholder="Enter Headquarters of Airline"
+                    v-model="headquarters"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -285,12 +334,12 @@ const closeModal = () => {
 }
 
 /* ส่วนของ Modal Add Flight */
-.modal-add-flight {
+.modal-add-airline {
   background-color: white;
   border: 1px solid var(--c-navy-light);
   border-radius: 10px;
   width: 100%;
-  max-width: 550px;
+  max-width: 750px;
   padding: 35px;
   font-family: Arial, sans-serif;
   position: relative;
@@ -445,6 +494,43 @@ const closeModal = () => {
 }
 
 /* ส่วนของ Form Container */
+
+.pic-detail {
+  display: flex;
+  gap: 35px;
+  align-items: center;
+}
+
+.pic-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 165px;
+  height: 165px;
+  border-radius: 50%;
+  background-color: #f0f5fa;
+  overflow: hidden;
+  border: 1px solid var(--c-navy-light);
+  flex-shrink: 0;
+}
+
+/* สร้าง wrapper ที่จะครอบทั้ง container และปุ่ม edit */
+.profile-pic-wrapper {
+  position: relative;
+  width: fit-content;
+  height: fit-content;
+}
+
+.pic-edit {
+  position: absolute;
+  bottom: 10px;
+  right: 1px; /* ให้ยื่นออกไปทางขวาของ container */
+  cursor: pointer;
+  z-index: 2;
+}
+
 .form-container {
   display: flex;
   flex-direction: column;

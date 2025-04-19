@@ -20,10 +20,10 @@ defineProps({
 const mode = ref("");
 
 const statusOptions = [
-  { value: "Pending", label: "Pending" },
-  { value: "Delayed", label: "Delayed" },
-  { value: "Completed", label: "Completed" },
-  { value: "Canceled", label: "Canceled" },
+  { value: "pending", label: "Pending" },
+  { value: "delayed", label: "Delayed" },
+  { value: "completed", label: "Completed" },
+  { value: "canceled", label: "Canceled" },
 ];
 
 // form data
