@@ -75,9 +75,8 @@ const selectedOption = computed(() =>
 }
 
 .status-button {
-  padding: 10px 15px;
-  width: 160px;
-  height: 40px;
+  padding: 8px 15px;
+  width: 200px;
   border: 1px solid var(--c-navy-light);
   border-radius: 10px;
   background: white;
@@ -181,6 +180,16 @@ const selectedOption = computed(() =>
   color: var(--c-light-orange);
 }
 
+.status-option.open span {
+  background-color: var(--c-dark-navy, #e0e8f0);
+  color: var(--c-soft-blue, #2d4b6d);
+}
+
+.status-option.temporarily-closed span {
+  background-color: var(--c-soft-blue, #e0e8f0);
+  color: var(--c-navy, #2d4b6d);
+}
+
 .status-option:last-child {
   border-bottom: none;
 }
@@ -189,7 +198,7 @@ const selectedOption = computed(() =>
 :deep(.badge) {
   font-size: 0.7rem;
   font-weight: 600;
-  padding: 4px 25px;
+  padding: 2px 25px;
   border-radius: 15px;
   display: inline-block;
 }
@@ -209,5 +218,15 @@ const selectedOption = computed(() =>
 :deep(.badge.delayed) {
   background-color: var(--c-soft-orange);
   color: var(--c-light-orange);
+}
+
+:deep(.badge.open) {
+  background-color: var(--c-dark-navy, #e0e8f0);
+  color: var(--c-soft-blue, #2d4b6d);
+}
+
+:deep(.badge.temporarily-closed) {
+  background-color: var(--c-soft-blue, #e0e8f0);
+  color: var(--c-navy, #2d4b6d);
 }
 </style>
