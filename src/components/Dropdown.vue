@@ -5,6 +5,7 @@ const props = defineProps({
   modelValue: String,
   statusOptions: {
     type: Array,
+    required: true,
   },
 });
 
