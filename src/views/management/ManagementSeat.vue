@@ -13,9 +13,6 @@ import {
   formatSelectedClassTypeId,
   formatSeatId,
 } from "@/data/management-seat.js";
-import { useRouter } from "vue-router";
-
-const router = useRouter();
 
 const isStatusDropdownOpen = ref(false);
 
@@ -84,10 +81,7 @@ const rowsByClass = computed(() => {
       </div>
 
       <div class="flight-info">
-        <button
-          class="back-button"
-          @click="router.push({ name: 'management-flight' })"
-        >
+        <button class="back-button">
           <svg
             width="20"
             height="20"

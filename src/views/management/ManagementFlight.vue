@@ -3,7 +3,6 @@ import ManagementOverview from "@/components/ManagementOverview.vue";
 import FlightPagination from "@/components/management-flight/FlightPagination.vue";
 import ModalAddFlight from "@/components/management-flight/ModalAddFlight.vue";
 import { ref, computed, onMounted } from "vue";
-import { useRouter } from "vue-router";
 import { useFlightStore } from "@/stores/flightStore";
 
 const flightStore = useFlightStore();
@@ -23,8 +22,6 @@ const tableHeaders = [
   { label: "Status", key: "status", filter: true },
   { label: "Action", key: null, filter: false },
 ];
-
-const router = useRouter();
 const showModal = ref(false);
 
 // โหลดข้อมูลเที่ยวบินเมื่อ component ถูก mount
@@ -169,24 +166,17 @@ const addFlight = (newFlight) => {
           v-for="(flight, index) in paginatedFlights"
           :key="index"
         >
-          <div
-            class="flight-cell seat-cell"
-            @click="
-              router.push({
-                name: 'management-seat',
-              })
-            "
-          >
+          <div class="flight-cell seat-cell">
             <div class="seat-icon">
               <img
                 v-if="flight.isSeatAvailable === true"
-                src="/management-pic/management-flight/available-seat.png"
-                alt="Available Seat"
+                src="/management-pic/management-seat/reserve-seat-type.png"
+                alt="Seat"
               />
               <img
                 v-else
-                src="/management-pic/management-flight/not-available-seat.png"
-                alt="Not available Seat"
+                src="/management-pic/management-seat/unreserve-seat-type.png"
+                alt="Seat"
               />
             </div>
           </div>
@@ -494,7 +484,6 @@ const addFlight = (newFlight) => {
 .seat-cell {
   display: flex;
   justify-content: center;
-  cursor: pointer;
 }
 
 /* Flight Information Cell Styling */
