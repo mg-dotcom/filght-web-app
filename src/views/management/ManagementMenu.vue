@@ -27,12 +27,12 @@ const showModal = () => {
       </div>
 
       <!-- Flight -->
-      <div class="management-flight-item">
+      <div class="management-airline-item">
         <div
           class="management-item"
           @click="
             router.push({
-              name: 'management-flight',
+              name: 'management-airline',
             })
           "
         >
@@ -44,7 +44,7 @@ const showModal = () => {
           </div>
         </div>
         <div class="label-container">
-          <div class="label-text">Flight <br />Management</div>
+          <div class="label-text">Airline <br />Management</div>
         </div>
       </div>
 
@@ -129,7 +129,7 @@ const showModal = () => {
 }
 
 .management-payment-item,
-.management-flight-item,
+.management-airline-item,
 .management-user-item {
   display: flex;
   flex-direction: column;

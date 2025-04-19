@@ -6,7 +6,6 @@ const router = useRouter();
 
 const navItems = [
   { icon: "home", label: "Dashboard", path: "/dashboard" },
-  // ใช้เป็นเพจหลักของ /management เป้น /management/seat ชั่วคราว
   { icon: "users", label: "Management", path: "/management/menu" },
   { icon: "file-text", label: "Reports", path: "/reports" },
 ];
@@ -54,7 +53,12 @@ const activeUsers = [
           v-for="(item, index) in navItems"
           :key="index"
           class="nav-item"
-          :class="{ active: route.path === item.path }"
+          :class="{
+            active:
+              (item.label === 'Management' &&
+                route.path.includes('/management')) ||
+              route.path === item.path,
+          }"
           @click="router.push(item.path)"
         >
           <div class="icon">
