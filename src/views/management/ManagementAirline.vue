@@ -1,11 +1,45 @@
 <script setup>
 import { airlines } from "@/data/management-airline.js";
+import ModalAddAirline from "@/components/management-airline/ModalAddAirline.vue";
 import { useRouter } from "vue-router";
+import { ref } from "vue";
+
 const router = useRouter();
+const isShowModalAddAirline = ref(false);
+
+const addFlight = (airline) => {
+  isShowModalAddAirline.value = false;
+};
 </script>
 
 <template>
   <div class="management-airline">
+    <div class="airline-header">
+      <div class="controls">
+        <div class="search-container">
+          <div class="search-icon">
+            <img src="/search-input.svg" alt="" />
+          </div>
+          <input type="text" placeholder="Search Flight" class="search-input" />
+        </div>
+        <Dropdown v-model="status" :statusOptions="statusOptions">
+          <template #trigger="{ selected }">
+            <span
+              :class="['badge', selected?.value?.toLowerCase()]"
+              v-if="selected"
+            >
+              {{ selected.label }}
+            </span>
+            <span v-else>Select Status</span>
+          </template>
+        </Dropdown>
+        <div class="status-selector">
+          <button class="status-button" @click="showModalAddFlight">
+            Add +
+          </button>
+        </div>
+      </div>
+    </div>
     <div class="airline-cards">
       <div
         v-for="(airline, index) in airlines"
@@ -102,6 +136,11 @@ const router = useRouter();
       </div>
     </div>
   </div>
+  <ModalAddAirline
+    :isShowModalAddAirline="isShowModalAddAirline"
+    @close="isShowModalAddAirline = false"
+    @addFlight="addFlight"
+  ></ModalAddAirline>
 </template>
 
 <style scoped>
@@ -328,6 +367,77 @@ const router = useRouter();
   width: 60px;
   height: 60px;
   color: #8c8c8c;
+}
+
+
+/* Control Section - Search and Buttons */
+.controls {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+/* Search Input Styling */
+.search-container {
+  position: relative;
+  width: 300px;
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 10px 10px 40px;
+  border: 1px solid var(--c-navy-light);
+  border-radius: 24px;
+  font-size: 14px;
+}
+
+.search-input::placeholder {
+  color: var(--c-navy-light);
+  opacity: 0.5;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--c-navy);
+  box-shadow: 0 0 5px rgba(57, 116, 153, 0.3);
+  transition: all 0.3s ease;
+}
+
+/* Status Selector Button */
+.status-selector {
+  position: relative;
+}
+
+.status-button {
+  padding: 10px 25px;
+  border: 1px solid var(--c-navy-light);
+  border-radius: 10px;
+  background: white;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--c-navy-light);
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.status-button:hover {
+  background-color: var(--c-navy-light);
+  color: white;
 }
 
 @media (max-width: 768px) {

@@ -54,7 +54,12 @@ const activeUsers = [
           v-for="(item, index) in navItems"
           :key="index"
           class="nav-item"
-          :class="{ active: route.path === item.path }"
+          :class="{
+            active:
+              (item.label === 'Management' &&
+                route.path.includes('/management')) ||
+              route.path === item.path,
+          }"
           @click="router.push(item.path)"
         >
           <div class="icon">

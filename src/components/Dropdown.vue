@@ -182,13 +182,23 @@ const selectedOption = computed(() =>
 }
 
 .status-option.open span {
-  background-color: var(--c-soft-blue);
-  color: var(--c-navy);
+  background-color: var(--c-dark-navy, #e0e8f0);
+  color: var(--c-soft-blue, #2d4b6d);
 }
 
 .status-option.temporarily-closed span {
-  background-color: var(--c-navy);
-  color: var(--c-soft-blue);
+  background-color: var(--c-soft-blue, #e0e8f0);
+  color: var(--c-navy, #2d4b6d);
+}
+
+.status-option.available span {
+  background-color: var(--c-dark-navy, #e0e8f0);
+  color: var(--c-soft-blue, #2d4b6d);
+}
+
+.status-option.not-available span {
+  background-color: var(--c-soft-blue, #e0e8f0);
+  color: var(--c-navy, #2d4b6d);
 }
 
 .status-option:last-child {
@@ -222,12 +232,22 @@ const selectedOption = computed(() =>
 }
 
 :deep(.badge.open) {
-  background-color: var(--c-soft-blue);
-  color: var(--c-navy);
+  background-color: var(--c-dark-navy, #e0e8f0);
+  color: var(--c-soft-blue, #2d4b6d);
 }
 
 :deep(.badge.temporarily-closed) {
-  background-color: var(--c-navy);
-  color: var(--c-soft-blue);
+  background-color: var(--c-soft-blue, #e0e8f0);
+  color: var(--c-navy, #2d4b6d);
+}
+
+:deep(.badge.available) {
+  background-color: var(--c-dark-navy, #e0e8f0);
+  color: var(--c-soft-blue, #2d4b6d);
+}
+
+:deep(.badge.not-available) {
+  background-color: var(--c-soft-blue, #e0e8f0);
+  color: var(--c-navy, #2d4b6d);
 }
 </style>

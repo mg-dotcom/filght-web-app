@@ -9,15 +9,21 @@ import Dropdown from "@/components/Dropdown.vue";
 import ModalAircraft from "@/components/management-flight/ModalAircraft.vue";
 
 const flightStore = useFlightStore();
+const flightData = computed(() => flightStore.getAllFlights);
 const tableHeaders = [
-  { label: "SeatAvailable" },
-  { label: "Departure" },
-  { label: "" },
-  { label: "Destination" },
-  { label: "Date" },
-  { label: "Aircraft" },
-  { label: "Status" },
-  { label: "Action" },
+  {
+    label: "SeatAvailable",
+    key: "isSeatAvailable",
+    filter: true,
+    center: true,
+  },
+  { label: "Departure", key: "departure.airport", filter: true },
+  { label: "", key: null, filter: false },
+  { label: "Destination", key: "destination.airport", filter: true },
+  { label: "Date", key: "date", filter: true },
+  { label: "Aircraft", key: "aircraft", filter: true },
+  { label: "Status", key: "status", filter: true },
+  { label: "Action", key: null, filter: false },
 ];
 const statusOptions = [
   { label: "Open", value: "open" },
@@ -38,6 +44,63 @@ onMounted(() => {
 
 // ส่วนของ pageination เเละ sort data
 const paginatedFlights = ref([]);
+const selectedFlightId = ref(null);
+
+// เอาค่า property ที่อยู่ใน object มาใช้
+const getNestedValue = (obj, path) => {
+  return path.split(".").reduce((o, key) => (o ? o[key] : null), obj);
+};
+
+const sortByProperty = (data, property, order) => {
+  return [...data].sort((a, b) => {
+    const valueA = getNestedValue(a, property);
+    const valueB = getNestedValue(b, property);
+
+    // ถ้าเป็น boolean ให้เปรียบเทียบค่า true/false
+    if (typeof valueA === "boolean") {
+      return order === "asc"
+        ? valueA === valueB
+          ? 0
+          : valueA
+          ? -1
+          : 1
+        : valueA === valueB
+        ? 0
+        : valueA
+        ? 1
+        : -1;
+    }
+
+    // ถ้าเป็น string ให้ใช้ localeCompare สำหรับการเปรียบเทียบ
+    if (typeof valueA === "string") {
+      return order === "asc"
+        ? valueA.localeCompare(valueB)
+        : valueB.localeCompare(valueA);
+    }
+
+    // ถ้าเป็น number ให้เปรียบเทียบค่าตรงๆ
+    return order === "asc" ? valueA - valueB : valueB - valueA;
+  });
+};
+
+const sortOrder = ref({});
+
+const filterHeader = (headerLabel) => {
+  const header = tableHeaders.find((h) => h.label === headerLabel);
+  const property = header?.key;
+  if (!property) return;
+
+  // กดที่ sort ครั้งแรกจะ sort ขึ้น asc
+  // กดที่ sort ครั้งที่สองจะ sort ลง desc
+  // กดที่ sort ครั้งที่สามจะ sort ขึ้น asc ใหม่อีกครั้ง [Toggle]
+  sortOrder.value[property] =
+    sortOrder.value[property] === "asc" ? "desc" : "asc";
+
+  const order = sortOrder.value[property];
+  // example: sortByProperty(flightData, "departure.airport" // property ที่่กดจาก header sort icon , "asc")
+  const sortedData = sortByProperty(flightData.value, property, order);
+  paginatedFlights.value = sortedData.slice(0, paginatedFlights.value.length);
+};
 
 // เป็นการส่งค่าจาก child component ไปยัง parent component
 // เพื่อให้ parent component สามารถอัพเดทข้อมูลได้ จากการกดเปลี่ยนหน้าเเต่ละครั้ง ข้อมูลจะถูกส่งไปที่ parent component
@@ -107,12 +170,20 @@ const showModalAircraft = () => {
             v-for="(header, index) in tableHeaders"
             :key="index"
             :style="
-              header.label === 'SeatAvailable'
-                ? 'display: flex; justify-content: center;'
-                : ''
+              header.center ? 'display: flex; justify-content: center;' : ''
             "
           >
             {{ header.label }}
+            <div
+              v-if="header.filter"
+              class="filter-icon"
+              @click="filterHeader(header.label)"
+            >
+              <img
+                src="/management-pic/management-airline/filter-icon.svg"
+                alt=""
+              />
+            </div>
           </div>
         </div>
 
