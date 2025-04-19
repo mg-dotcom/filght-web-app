@@ -3,9 +3,6 @@ import { useRouter } from "vue-router";
 import { ref } from "vue";
 const show = ref(false);
 const router = useRouter();
-const showModal = () => {
-  show.value = !show.value;
-};
 </script>
 
 <template>
@@ -32,7 +29,7 @@ const showModal = () => {
           class="management-item"
           @click="
             router.push({
-              name: 'management-flight',
+              name: 'management-airline',
             })
           "
         >
@@ -44,7 +41,7 @@ const showModal = () => {
           </div>
         </div>
         <div class="label-container">
-          <div class="label-text">Flight <br />Management</div>
+          <div class="label-text">Airline <br />Management</div>
         </div>
       </div>
 

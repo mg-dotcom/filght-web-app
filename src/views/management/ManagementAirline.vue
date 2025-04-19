@@ -1,5 +1,7 @@
 <script setup>
 import { airlines } from "@/data/management-airline.js";
+import { useRouter } from "vue-router";
+const router = useRouter();
 </script>
 
 <template>
@@ -29,7 +31,18 @@ import { airlines } from "@/data/management-airline.js";
         </div>
 
         <div class="card-section title-section" style="grid-area: title">
-          <div class="airline-title">
+          <div
+            class="airline-title"
+            @click="
+              // router.push({
+              //   name: 'management-airline-detail',
+              //   params: { airlineId: airline.id },
+              // })
+              router.push({
+                name: 'management-flight',
+              })
+            "
+          >
             <h3>{{ airline.name }}</h3>
             <p>#{{ airline.id }}</p>
           </div>
@@ -197,6 +210,13 @@ import { airlines } from "@/data/management-airline.js";
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
+}
+
+.airline-title:hover {
+  color: #dfe0e1; /* A bit gray color */
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.3s ease, text-decoration 0.3s ease;
 }
 
 .airline-title h3 {

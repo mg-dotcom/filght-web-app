@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import ManagementOverview from "@/components/ManagementOverview.vue";
+import { useRouter } from "vue-router";
 import {
   seatData,
   economySeatsData,
@@ -69,6 +70,8 @@ const seatsByClass = computed(() => {
 const rowsByClass = computed(() => {
   return getUniqueRows(seatsByClass.value);
 });
+
+const router = useRouter();
 </script>
 
 <template>
@@ -81,7 +84,7 @@ const rowsByClass = computed(() => {
       </div>
 
       <div class="flight-info">
-        <button class="back-button">
+        <button class="back-button" @click="router.back()">
           <svg
             width="20"
             height="20"

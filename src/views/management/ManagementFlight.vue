@@ -525,6 +525,7 @@ const statusOptions = [
 .seat-cell {
   display: flex;
   justify-content: center;
+  cursor: pointer;
 }
 
 /* Flight Information Cell Styling */
