@@ -4,6 +4,8 @@ import FlightPagination from "@/components/management-flight/FlightPagination.vu
 import ModalAddFlight from "@/components/management-flight/ModalAddFlight.vue";
 import { ref, computed, onMounted } from "vue";
 import { useFlightStore } from "@/stores/flightStore";
+import { useRouter } from "vue-router";
+import Dropdown from "@/components/Dropdown.vue";
 
 const flightStore = useFlightStore();
 const flightData = computed(() => flightStore.getAllFlights);
@@ -22,7 +24,12 @@ const tableHeaders = [
   { label: "Status", key: "status", filter: true },
   { label: "Action", key: null, filter: false },
 ];
+
+// const flightStore = useFlightStore();
+const router = useRouter();
 const showModal = ref(false);
+const status = ref("");
+const formMode = ref("");
 
 // โหลดข้อมูลเที่ยวบินเมื่อ component ถูก mount
 onMounted(() => {
@@ -31,6 +38,7 @@ onMounted(() => {
 
 // ส่วนของ pageination เเละ sort data
 const paginatedFlights = ref([]);
+const selectedFlightId = ref(null);
 
 // เอาค่า property ที่อยู่ใน object มาใช้
 const getNestedValue = (obj, path) => {
@@ -97,6 +105,17 @@ const updatePaginatedFlights = (flights) => {
 
 const showModalAddFlight = () => {
   showModal.value = true;
+  formMode.value = "add";
+};
+
+const showModalEditFlight = (id) => {
+  // showModal.value = true;
+  // formMode.value = "edit";
+  // selectedFlightId.value = id;
+  router.push({
+    name: "management-flight-edit",
+    params: { id: id },
+  });
 };
 
 const addFlight = (newFlight) => {
@@ -106,6 +125,11 @@ const addFlight = (newFlight) => {
   // flightStore.loadFlights();
   console.log("New Flight Data:", newFlight);
 };
+
+const statusOptions = [
+  { label: "Open", value: "open" },
+  { label: "Temporarily closed", value: "temporarily-closed" },
+];
 </script>
 
 <template>
@@ -127,7 +151,17 @@ const addFlight = (newFlight) => {
           </div>
           <input type="text" placeholder="Search Flight" class="search-input" />
         </div>
-
+        <Dropdown v-model="status" :statusOptions="statusOptions">
+          <template #trigger="{ selected }">
+            <span
+              :class="['badge', selected?.value?.toLowerCase()]"
+              v-if="selected"
+            >
+              {{ selected.label }}
+            </span>
+            <span v-else>Select Status</span>
+          </template>
+        </Dropdown>
         <div class="status-selector">
           <button class="status-button" @click="showModalAddFlight">
             Add +
@@ -166,17 +200,24 @@ const addFlight = (newFlight) => {
           v-for="(flight, index) in paginatedFlights"
           :key="index"
         >
-          <div class="flight-cell seat-cell">
+          <div
+            class="flight-cell seat-cell"
+            @click="
+              router.push({
+                name: 'management-seat',
+              })
+            "
+          >
             <div class="seat-icon">
               <img
                 v-if="flight.isSeatAvailable === true"
-                src="/management-pic/management-seat/reserve-seat-type.png"
-                alt="Seat"
+                src="/management-pic/management-flight/available-seat.png"
+                alt="Available Seat"
               />
               <img
                 v-else
-                src="/management-pic/management-seat/unreserve-seat-type.png"
-                alt="Seat"
+                src="/management-pic/management-flight/not-available-seat.png"
+                alt="Not available Seat"
               />
             </div>
           </div>
@@ -260,7 +301,7 @@ const addFlight = (newFlight) => {
           </div>
 
           <div class="flight-cell action-cell">
-            <button class="edit-button">
+            <button class="edit-button" @click="showModalEditFlight(flight.id)">
               <svg
                 width="20"
                 height="20"

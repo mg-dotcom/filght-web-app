@@ -1,11 +1,13 @@
 <script setup>
-import { ref, defineProps, defineEmits } from "vue";
+import { ref, defineProps, defineEmits, onMounted, onBeforeUnmount } from "vue";
+import ModalConfirm from "../ModalConfirm.vue";
+import Dropdown from "../Dropdown.vue";
 
-const emit = defineEmits(["addFlight", "close"]); // ✅ ต้องมีบรรทัดนี้!
+const emit = defineEmits(["addFlight", "close"]);
+const isShowConfirmModal = ref(false);
 
-const isStatusDropdownOpen = ref(false);
-const toggleStatusDropdown = () => {
-  isStatusDropdownOpen.value = !isStatusDropdownOpen.value;
+const showConfirmAddFlight = () => {
+  isShowConfirmModal.value = true;
 };
 
 defineProps({
@@ -15,32 +17,86 @@ defineProps({
   },
 });
 
+const mode = ref("");
+
+const statusOptions = [
+  { value: "Pending", label: "Pending" },
+  { value: "Delayed", label: "Delayed" },
+  { value: "Completed", label: "Completed" },
+  { value: "Canceled", label: "Canceled" },
+];
+
+// form data
+const from = ref("");
+const departureDate = ref("");
+const departureTime = ref("");
+
+const to = ref("");
+const arrivalDate = ref("");
+const arrivalTime = ref("");
+
+const aircraft = ref("");
+const stop = ref(0);
+const duration = ref(0);
+
+const status = ref("");
+
+const confirmAddFlight = () => {
+  mode.value = "success";
+  showConfirmAddFlight();
+};
+
+const discardAddFlight = () => {
+  mode.value = "discard";
+  showConfirmAddFlight();
+};
+
 const addFlight = () => {
-  emit("addFlight");
+  const flightData = {
+    from: from.value,
+    departureDate: departureDate.value,
+    departureTime: departureTime.value,
+    to: to.value,
+    arrivalDate: arrivalDate.value,
+    arrivalTime: arrivalTime.value,
+    aircraft: aircraft.value,
+    stop: stop.value,
+    duration: duration.value,
+    status: status.value,
+  };
+  emit("addFlight", flightData);
+  isShowConfirmModal.value = false;
+  closeModal();
+};
+
+const closeModal = () => {
+  from.value = "";
+  departureDate.value = "";
+  departureTime.value = "";
+  to.value = "";
+  arrivalDate.value = "";
+  arrivalTime.value = "";
+  aircraft.value = "";
+  stop.value = 0;
+  duration.value = 0;
+  status.value = "";
+  isShowConfirmModal.value = false;
+
   emit("close");
 };
 </script>
 
 <template>
   <Transition name="modal-container">
-    <div
-      v-if="showModal"
-      class="modal-container"
-      @click.self="() => emit('close')"
-    >
+    <div v-if="showModal" class="modal-container" @click.self="closeModal">
       <div class="modal-content">
         <div>
           <div class="modal-add-flight">
             <div class="modal-header">
               <div class="modal-action">
-                <div @click="addFlight" class="check-button">
-                  <svg
-                    width="30"
-                    height="30"
-                    viewBox="0 0 30 30"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
+                <div @click="confirmAddFlight" class="check-button">
+                  <!-- Confirm Button SVG -->
+                  <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
                     <rect
                       x="0.5"
                       y="0.5"
@@ -57,7 +113,7 @@ const addFlight = () => {
                   </svg>
                 </div>
 
-                <div class="check-button" @click="$emit('close')">
+                <div class="check-button" @click="discardAddFlight">
                   <svg
                     width="30"
                     height="30"
@@ -84,30 +140,17 @@ const addFlight = () => {
                 </div>
               </div>
               <h2>Add Flight Details</h2>
-              <div class="status-selector">
-                <button class="status-button" @click="toggleStatusDropdown">
-                  Select Status
+              <Dropdown v-model="status" :statusOptions="statusOptions">
+                <template #trigger="{ selected }">
                   <span
-                    class="dropdown-icon"
-                    :class="{ open: isStatusDropdownOpen }"
-                  ></span>
-                </button>
-
-                <div class="status-dropdown" v-if="isStatusDropdownOpen">
-                  <div class="status-option pending">
-                    <span>Pending</span>
-                  </div>
-                  <div class="status-option delayed">
-                    <span>Delayed</span>
-                  </div>
-                  <div class="status-option completed">
-                    <span>Completed</span>
-                  </div>
-                  <div class="status-option canceled">
-                    <span>Canceled</span>
-                  </div>
-                </div>
-              </div>
+                    :class="['badge', selected?.value?.toLowerCase()]"
+                    v-if="selected"
+                  >
+                    {{ selected.label }}
+                  </span>
+                  <span v-else>Select Status</span>
+                </template>
+              </Dropdown>
             </div>
 
             <div class="form-container">
@@ -118,9 +161,9 @@ const addFlight = () => {
               </div>
 
               <div class="form-row inputs">
-                <input type="text" placeholder="- - -" />
-                <input type="date" />
-                <input type="time" placeholder="- - : - -" />
+                <input type="text" placeholder="- - -" v-model="from" />
+                <input type="date" v-model="departureDate" />
+                <input type="time" v-model="departureTime" />
               </div>
 
               <div class="form-row">
@@ -130,13 +173,9 @@ const addFlight = () => {
               </div>
 
               <div class="form-row inputs">
-                <input type="text" placeholder="- - -" />
-                <input
-                  type="date"
-                  placeholder="dd/mm/yyyy"
-                  class="faded-placeholder"
-                />
-                <input type="time" placeholder="- - : - -" />
+                <input type="text" placeholder="- - -" v-model="to" />
+                <input type="date" v-model="arrivalDate" />
+                <input type="time" v-model="arrivalTime" />
               </div>
 
               <div
@@ -160,9 +199,13 @@ const addFlight = () => {
                   align-items: center;
                 "
               >
-                <input type="text" placeholder="Boeing 123-456" />
-                <input type="number" placeholder="- -" />
-                <input type="number" placeholder="- -" />
+                <input
+                  type="text"
+                  placeholder="Boeing 123-456"
+                  v-model="aircraft"
+                />
+                <input type="number" placeholder="- -" v-model="stop" />
+                <input type="number" placeholder="- -" v-model="duration" />
               </div>
             </div>
           </div>
@@ -170,25 +213,33 @@ const addFlight = () => {
       </div>
     </div>
   </Transition>
-  <!-- <Transition name="modal">
-    <div
-      v-if="showModal"
-      class="my-modal"
-      @click.self="() => emit('close')"
-      style="
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        justify-content: center;
-        background-color: rgba(0, 0, 0, 0.5);
-        align-items: center;
-        z-index: 1000;
-      "
-    ></div>
-  </Transition> -->
+  <!-- Confirmation Modal -->
+  <ModalConfirm
+    :mode="mode"
+    :isShowConfirmModal="isShowConfirmModal"
+    @closeConfirmModal="isShowConfirmModal = false"
+    @closeModal="closeModal"
+    @addFlight="addFlight"
+  >
+    <template #header>
+      {{ mode === "success" ? "Success Confirmation" : "Discard Confirmation" }}
+    </template>
+    <template #body>
+      <p>
+        {{
+          mode === "success"
+            ? "Are you sure you want to add this flight?"
+            : "Are you sure you want to discard this flight?"
+        }}
+      </p>
+    </template>
+    <template #footer-summit>
+      <p>Yes</p>
+    </template>
+    <template #footer-cancel>
+      <div>Cancel</div>
+    </template>
+  </ModalConfirm>
 </template>
 
 <style scoped>
@@ -263,12 +314,14 @@ const addFlight = () => {
   cursor: pointer;
 }
 
-.check-button:hover svg rect {
+.check-button:hover svg rect,
+.close-button:hover svg rect {
   filter: brightness(0.9);
   transition: filter 0.3s ease;
 }
 
-.check-button:active {
+.check-button:active,
+.close-button:active {
   transform: scale(0.95);
 }
 
