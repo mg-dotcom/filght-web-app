@@ -3,7 +3,7 @@ import { ref, defineProps, defineEmits, onMounted, onBeforeUnmount } from "vue";
 import ModalConfirm from "../ModalConfirm.vue";
 import Dropdown from "@/components/Dropdown.vue";
 
-const emit = defineEmits(["addFlight", "close"]);
+const emit = defineEmits(["addAirline", "close"]);
 const isShowConfirmModal = ref(false);
 
 const showConfirmAddFlight = () => {
@@ -25,6 +25,8 @@ const statusOptions = [
 ];
 
 // form data
+const airlineImage = ref(null);
+
 const airlineName = ref("");
 const code = ref("");
 
@@ -46,39 +48,151 @@ const discardAddFlight = () => {
   showConfirmAddFlight();
 };
 
-const addFlight = () => {
-  const flightData = {
-    from: from.value,
-    departureDate: departureDate.value,
-    departureTime: departureTime.value,
-    to: to.value,
-    arrivalDate: arrivalDate.value,
-    arrivalTime: arrivalTime.value,
-    aircraft: aircraft.value,
-    stop: stop.value,
-    duration: duration.value,
+const addAirline = () => {
+  const airlineData = {
+    airlineImage: airlineImage.value,
+    airlineName: airlineName.value,
+    code: code.value,
+    contactPrefix: contactPrefix.value,
+    contactNumber: contactNumber.value,
+    country: country.value,
+    headquarters: headquarters.value,
     status: status.value,
   };
-  emit("addFlight", flightData);
+  emit("addAirline", airlineData);
   isShowConfirmModal.value = false;
   closeModal();
 };
 
 const closeModal = () => {
-  from.value = "";
-  departureDate.value = "";
-  departureTime.value = "";
-  to.value = "";
-  arrivalDate.value = "";
-  arrivalTime.value = "";
-  aircraft.value = "";
-  stop.value = 0;
-  duration.value = 0;
+  airlineImage.value = null;
+  airlineName.value = "";
+  code.value = "";
+  contactPrefix.value = "";
+  contactNumber.value = "";
+  country.value = "";
+  headquarters.value = "";
   status.value = "";
   isShowConfirmModal.value = false;
 
   emit("close");
 };
+
+// ประกาศตัวแปรให้ถูกต้อง
+const uploadInputRef = ref(null);
+
+// เมื่อ ฺBackend เสร็จเเล้ว ให้ใช้โค้ดนี้แทน
+// const openUploadImageAirline = () => {
+//   if (!uploadInputRef.value) {
+//     const input = document.createElement("input");
+//     input.type = "file";
+//     input.accept = "image/*";
+//     input.style.display = "none";
+//     input.onchange = handleImageUpload;
+//     document.body.appendChild(input);
+//     uploadInputRef.value = input;
+//   }
+
+//   uploadInputRef.value.click();
+// };
+
+// const handleImageUpload = async (event) => {
+//   const file = event.target.files[0];
+//   if (!file) return;
+
+//   try {
+//     // สร้าง FormData สำหรับส่งไฟล์
+//     const formData = new FormData();
+//     formData.append("image", file);
+
+//     // ส่งไฟล์ไปยัง API endpoint สำหรับอัปโหลดรูปภาพ
+//     const response = await fetch("/api/upload-image", {
+//       method: "POST",
+//       body: formData,
+//     });
+
+//     if (!response.ok) {
+//       throw new Error("การอัปโหลดรูปภาพล้มเหลว");
+//     }
+
+//     // รับ path ของรูปภาพที่อัปโหลดแล้วจาก backend
+//     const result = await response.json();
+//     const imagePath = result.imagePath; // เช่น "/uploads/airlines/image-1234567890.jpg"
+
+//     // เก็บ path ของรูปภาพ
+//     airlineImage.value = imagePath;
+
+//     // แสดงรูปภาพใน .pic element
+//     const picElement = document.querySelector(".pic");
+//     if (picElement) {
+//       picElement.style.backgroundImage = `url(${imagePath})`;
+//       picElement.style.backgroundSize = "cover";
+//       picElement.style.backgroundPosition = "center";
+//     }
+//   } catch (error) {
+//     console.error("Error occur:", error);
+//   } finally {
+//     event.target.value = ""; // รีเซ็ตค่า input เพื่อให้สามารถเลือกไฟล์เดิมได้อีก
+//   }
+// };
+
+const openUploadImageAirline = () => {
+  if (!uploadInputRef.value) {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.style.display = "none";
+    input.onchange = handleImageUpload;
+    document.body.appendChild(input);
+    uploadInputRef.value = input;
+  }
+
+  uploadInputRef.value.click();
+};
+
+const handleImageUpload = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // เก็บไฟล์ไว้ในตัวแปรชั่วคราวเพื่อใช้ในการแสดงผล
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const imageDataUrl = e.target.result;
+
+    // จำลองการได้รับ path กลับมาจาก server
+    // ในสถานการณ์จริง path จะถูกสร้างและส่งกลับมาจาก backend
+    const mockImagePath = `/uploads/airlines/${file.name}`;
+
+    // เก็บ mock path
+    airlineImage.value = mockImagePath;
+
+    console.log("Mock uploaded image path:", mockImagePath);
+
+    // แสดงรูปภาพใน .pic element (ใช้ Data URL ชั่วคราว)
+    const picElement = document.querySelector(".pic");
+    if (picElement) {
+      // ใช้ Data URL เพื่อแสดงผลในขณะที่ทำ mock
+      picElement.style.backgroundImage = `url(${imageDataUrl})`;
+      picElement.style.backgroundSize = "cover";
+      picElement.style.backgroundPosition = "center";
+    }
+
+    // จำลองการบันทึกข้อมูลลงฐานข้อมูล (log ข้อมูลที่จะส่งไป backend)
+    console.log("ข้อมูลที่จะบันทึกลงฐานข้อมูล:", {
+      // ข้อมูลอื่นๆ ของสายการบิน
+      imagePath: airlineImage.value,
+    });
+  };
+
+  reader.readAsDataURL(file);
+  event.target.value = ""; // รีเซ็ตค่า input เพื่อให้สามารถเลือกไฟล์เดิมได้อีก
+};
+
+onBeforeUnmount(() => {
+  if (uploadInputRef.value && uploadInputRef.value.parentNode) {
+    uploadInputRef.value.parentNode.removeChild(uploadInputRef.value);
+  }
+});
 </script>
 
 <template>
@@ -155,9 +269,12 @@ const closeModal = () => {
             <div class="pic-detail">
               <div class="profile-pic-wrapper">
                 <div class="pic-container">
-                  <div class="pic"></div>
+                  <div
+                    class="pic"
+                    :style="`background-image: url(${airlineImage})`"
+                  ></div>
                 </div>
-                <div class="pic-edit">
+                <div class="pic-edit" @click="openUploadImageAirline">
                   <svg
                     width="32"
                     height="32"
@@ -272,7 +389,7 @@ const closeModal = () => {
     :isShowConfirmModal="isShowConfirmModal"
     @closeConfirmModal="isShowConfirmModal = false"
     @closeModal="closeModal"
-    @addFlight="addFlight"
+    @addModal="addAirline"
   >
     <template #header>
       {{ mode === "success" ? "Success Confirmation" : "Discard Confirmation" }}
@@ -281,8 +398,8 @@ const closeModal = () => {
       <p>
         {{
           mode === "success"
-            ? "Are you sure you want to add this flight?"
-            : "Are you sure you want to discard this flight?"
+            ? "Are you sure you want to add this airline?"
+            : "Are you sure you want to discard this airline?"
         }}
       </p>
     </template>
@@ -514,6 +631,13 @@ const closeModal = () => {
   overflow: hidden;
   border: 1px solid var(--c-navy-light);
   flex-shrink: 0;
+}
+
+.pic {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
 }
 
 /* สร้าง wrapper ที่จะครอบทั้ง container และปุ่ม edit */

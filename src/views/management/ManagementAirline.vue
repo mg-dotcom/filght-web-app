@@ -9,6 +9,8 @@ const isShowModalAddAirline = ref(false);
 
 const addFlight = (airline) => {
   isShowModalAddAirline.value = false;
+
+  console.log("Airline added:", airline);
 };
 
 const showModalAddAirline = () => {
@@ -141,7 +143,7 @@ const showModalAddAirline = () => {
   <ModalAddAirline
     :isShowModalAddAirline="isShowModalAddAirline"
     @close="isShowModalAddAirline = false"
-    @addFlight="addFlight"
+    @addAirline="addFlight"
   ></ModalAddAirline>
 </template>
 

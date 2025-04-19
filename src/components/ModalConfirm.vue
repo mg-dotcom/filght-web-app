@@ -8,7 +8,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["closeConfirmModal", "addFlight", "closeModal"]);
+const emit = defineEmits(["closeConfirmModal", "addModal", "closeModal"]);
 </script>
 
 <template>
@@ -31,7 +31,7 @@ const emit = defineEmits(["closeConfirmModal", "addFlight", "closeModal"]);
             :class="mode === 'success' ? 'success' : 'discard'"
             @click="
               {
-                mode === 'success' ? emit('addFlight') : emit('closeModal');
+                mode === 'success' ? emit('addModal') : emit('closeModal');
               }
             "
           >
