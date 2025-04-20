@@ -29,18 +29,16 @@ const statusOptions = [
 ];
 
 // form data
-const airlineImage = ref(null);
-
-const airlineName = ref("");
-const code = ref("");
-
-const contactPrefix = ref("");
-const contactNumber = ref("");
-
-const country = ref("");
-const headquarters = ref("");
-
-const status = ref("");
+const form = ref({
+  airlineImage: null,
+  airlineName: "",
+  code: "",
+  contactPrefix: "",
+  contactNumber: "",
+  country: "",
+  headquarters: "",
+  airlineStatus: "",
+});
 
 const confirmAddFlight = () => {
   mode.value = "success";
@@ -53,32 +51,16 @@ const discardAddFlight = () => {
 };
 
 const addAirline = () => {
-  const airlineData = {
-    airlineImage: airlineImage.value,
-    airlineName: airlineName.value,
-    code: code.value,
-    contactPrefix: contactPrefix.value,
-    contactNumber: contactNumber.value,
-    country: country.value,
-    headquarters: headquarters.value,
-    status: status.value,
-  };
+  const airlineData = { ...form.value };
   emit("addAirline", airlineData);
-  isShowConfirmModal.value = false;
   closeModal();
 };
 
 const closeModal = () => {
-  airlineImage.value = null;
-  airlineName.value = "";
-  code.value = "";
-  contactPrefix.value = "";
-  contactNumber.value = "";
-  country.value = "";
-  headquarters.value = "";
-  status.value = "";
+  for (const key in form.value) {
+    form.value[key] = typeof form.value[key] === "string" ? "" : null;
+  }
   isShowConfirmModal.value = false;
-
   emit("close");
 };
 
@@ -163,7 +145,7 @@ const handleImageUpload = (event) => {
     const imageDataUrl = e.target.result;
     // จำลอง path
     const mockImagePath = `/uploads/airlines/${file.name}`;
-    airlineImage.value = mockImagePath;
+    form.value.airlineImage = mockImagePath;
 
     const picElement = document.querySelector(".pic");
     console.log("picElement:", picElement);
@@ -249,7 +231,10 @@ onBeforeUnmount(() => {
                 </div>
               </div>
               <h2>Add Airline Details</h2>
-              <Dropdown v-model="status" :statusOptions="statusOptions">
+              <Dropdown
+                v-model="form.airlineStatus"
+                :statusOptions="statusOptions"
+              >
                 <template #trigger="{ selected }">
                   <span
                     :class="['badge', selected?.class?.toLowerCase()]"
@@ -267,7 +252,7 @@ onBeforeUnmount(() => {
                 <div class="pic-container">
                   <div
                     class="pic"
-                    :style="`background-image: url(${airlineImage})`"
+                    :style="`background-image: url(${form.airlineImage})`"
                   ></div>
                 </div>
                 <div class="pic-edit" @click="openUploadImageAirline">
@@ -318,9 +303,9 @@ onBeforeUnmount(() => {
                   <input
                     type="text"
                     placeholder="Enter Airline Name"
-                    v-model="airlineName"
+                    v-model="form.airlineName"
                   />
-                  <input type="text" placeholder="- -" v-model="code" />
+                  <input type="text" placeholder="- -" v-model="form.code" />
                 </div>
 
                 <div
@@ -346,17 +331,17 @@ onBeforeUnmount(() => {
                   <input
                     type="text"
                     placeholder="+66"
-                    v-model="contactPrefix"
+                    v-model="form.contactPrefix"
                   />
                   <input
                     type="text"
                     placeholder="12345678"
-                    v-model="contactNumber"
+                    v-model="form.contactNumber"
                   />
                   <input
                     type="text"
                     placeholder="Enter Country"
-                    v-model="country"
+                    v-model="form.country"
                   />
                 </div>
 
@@ -369,7 +354,7 @@ onBeforeUnmount(() => {
                     style="grid-column: span 3"
                     type="text"
                     placeholder="Enter Headquarters of Airline"
-                    v-model="headquarters"
+                    v-model="form.headquarters"
                   />
                 </div>
               </div>

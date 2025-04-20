@@ -27,19 +27,18 @@ const statusOptions = [
 ];
 
 // form data
-const from = ref("");
-const departureDate = ref("");
-const departureTime = ref("");
-
-const to = ref("");
-const arrivalDate = ref("");
-const arrivalTime = ref("");
-
-const aircraft = ref("");
-const stop = ref(0);
-const duration = ref(0);
-
-const status = ref("");
+const form = ref({
+  from: "",
+  departureDate: "",
+  departureTime: "",
+  to: "",
+  arrivalDate: "",
+  arrivalTime: "",
+  aircraft: "",
+  stop: 0,
+  duration: 0,
+  flightstatus: "",
+});
 
 const confirmAddFlight = () => {
   mode.value = "success";
@@ -52,36 +51,16 @@ const discardAddFlight = () => {
 };
 
 const addFlight = () => {
-  const flightData = {
-    from: from.value,
-    departureDate: departureDate.value,
-    departureTime: departureTime.value,
-    to: to.value,
-    arrivalDate: arrivalDate.value,
-    arrivalTime: arrivalTime.value,
-    aircraft: aircraft.value,
-    stop: stop.value,
-    duration: duration.value,
-    status: status.value,
-  };
+  const flightData = { ...form.value };
   emit("addFlight", flightData);
-  isShowConfirmModal.value = false;
   closeModal();
 };
 
 const closeModal = () => {
-  from.value = "";
-  departureDate.value = "";
-  departureTime.value = "";
-  to.value = "";
-  arrivalDate.value = "";
-  arrivalTime.value = "";
-  aircraft.value = "";
-  stop.value = 0;
-  duration.value = 0;
-  status.value = "";
+  for (const key in form.value) {
+    form.value[key] = typeof form.value[key] === "string" ? "" : null;
+  }
   isShowConfirmModal.value = false;
-
   emit("close");
 };
 </script>
@@ -140,7 +119,7 @@ const closeModal = () => {
                 </div>
               </div>
               <h2>Add Flight Details</h2>
-              <Dropdown v-model="status" :statusOptions="statusOptions">
+              <Dropdown v-model="form.flightstatus" :statusOptions="statusOptions">
                 <template #trigger="{ selected }">
                   <span
                     :class="['badge', selected?.class?.toLowerCase()]"
@@ -161,9 +140,9 @@ const closeModal = () => {
               </div>
 
               <div class="form-row inputs">
-                <input type="text" placeholder="- - -" v-model="from" />
-                <input type="date" v-model="departureDate" />
-                <input type="time" v-model="departureTime" />
+                <input type="text" placeholder="- - -" v-model="form.from" />
+                <input type="date" v-model="form.departureDate" />
+                <input type="time" v-model="form.departureTime" />
               </div>
 
               <div class="form-row">
@@ -173,9 +152,9 @@ const closeModal = () => {
               </div>
 
               <div class="form-row inputs">
-                <input type="text" placeholder="- - -" v-model="to" />
-                <input type="date" v-model="arrivalDate" />
-                <input type="time" v-model="arrivalTime" />
+                <input type="text" placeholder="- - -" v-model="form.to" />
+                <input type="date" v-model="form.arrivalDate" />
+                <input type="time" v-model="form.arrivalTime" />
               </div>
 
               <div
@@ -202,10 +181,14 @@ const closeModal = () => {
                 <input
                   type="text"
                   placeholder="Boeing 123-456"
-                  v-model="aircraft"
+                  v-model="form.aircraft"
                 />
-                <input type="number" placeholder="- -" v-model="stop" />
-                <input type="number" placeholder="- -" v-model="duration" />
+                <input type="number" placeholder="- -" v-model="form.stop" />
+                <input
+                  type="number"
+                  placeholder="- -"
+                  v-model="form.duration"
+                />
               </div>
             </div>
           </div>
@@ -219,7 +202,7 @@ const closeModal = () => {
     :isShowConfirmModal="isShowConfirmModal"
     @closeConfirmModal="isShowConfirmModal = false"
     @closeModal="closeModal"
-    @addFlight="addFlight"
+    @addModal="addFlight"
   >
     <template #header>
       {{ mode === "success" ? "Success Confirmation" : "Discard Confirmation" }}

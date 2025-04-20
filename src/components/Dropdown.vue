@@ -3,7 +3,7 @@ import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 
 const props = defineProps({
   modelValue: {
-    type: [String, Boolean],
+    type: [String, Boolean, Number],
     required: true,
   },
   statusOptions: {
