@@ -8,10 +8,13 @@ export const useFlightStore = defineStore("flight", {
   }),
 
   getters: {
-    getAvailableFlights: (state) =>
-      state.flights.filter((f) => f.isSeatAvailable),
-    getTotalFlights: (state) => state.flights.length,
     getAllFlights: (state) => state.flights,
+    getFlightsByAirlineId: (state) => (airlineID) => {
+      return state.flights.filter((flight) => flight.airlineID === airlineID);
+    },
+    getFlightByID: (state) => (flightID) => {
+      return state.flights.find((flight) => flight.flightID === flightID);
+    },
   },
 
   actions: {

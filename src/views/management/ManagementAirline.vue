@@ -52,7 +52,7 @@ const showModalAddAirline = () => {
 
     <div class="airline-cards">
       <div
-        v-for="(airline, index) in airlineStore.getAllAirlines()"
+        v-for="(airline, index) in airlineStore.getAllAirlines"
         :key="index"
         class="airline-card"
         :style="{
@@ -73,12 +73,9 @@ const showModalAddAirline = () => {
           <div
             class="airline-title"
             @click="
-              // router.push({
-              //   name: 'management-airline-detail',
-              //   params: { airlineId: airline.id },
-              // })
               router.push({
                 name: 'management-flight',
+                params: { airlineID: airline.airlineID },
               })
             "
           >

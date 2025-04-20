@@ -37,7 +37,7 @@ const form = ref({
   aircraft: "",
   stop: 0,
   duration: 0,
-  flightstatus: "",
+  flightStatus: "",
 });
 
 const confirmAddFlight = () => {
@@ -119,7 +119,10 @@ const closeModal = () => {
                 </div>
               </div>
               <h2>Add Flight Details</h2>
-              <Dropdown v-model="form.flightstatus" :statusOptions="statusOptions">
+              <Dropdown
+                v-model="form.flightStatus"
+                :statusOptions="statusOptions"
+              >
                 <template #trigger="{ selected }">
                   <span
                     :class="['badge', selected?.class?.toLowerCase()]"

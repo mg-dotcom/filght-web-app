@@ -39,7 +39,7 @@ const router = createRouter({
           component: ManagementAirline,
         },
         {
-          path: "flight",
+          path: ":airlineID/flight",
           name: "management-flight",
           component: ManagementFlight,
         },

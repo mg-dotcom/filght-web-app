@@ -9,6 +9,10 @@ export const useAirlineStore = defineStore("airline", {
 
   getters: {
     getTotalAirlines: (state) => state.airlines.length,
+    getAllAirlines: (state) => state.airlines,
+    getAirlineByID: (state) => (airlineID) => {
+      return state.airlines.find((airline) => airline.airlineID === airlineID);
+    },
   },
 
   actions: {
@@ -17,9 +21,6 @@ export const useAirlineStore = defineStore("airline", {
     },
     addAirline(airline) {
       this.airlines.push(airline);
-    },
-    getAllAirlines() {
-      return this.airlines;
     },
   },
 });

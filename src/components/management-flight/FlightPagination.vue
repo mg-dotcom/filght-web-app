@@ -1,15 +1,19 @@
 <script setup>
 import { useFlightStore } from "@/stores/flightStore";
 import { ref, computed, watch, defineEmits, onMounted } from "vue";
+import { useRoute } from "vue-router";
 
 const emit = defineEmits(["update:paginatedData"]);
+const route = useRoute();
+const airlineID = route.params.airlineID;
 const flightStore = useFlightStore();
 const itemsPerPage = 6;
 const currentPage = ref(1);
-const flightData = computed(() => flightStore.getAllFlights);
+// ได้ข้อมูล flight ของ airlineID ที่เลือกจาก route params
+const flightData = computed(() => flightStore.getFlightsByAirlineId(airlineID));
 
 onMounted(() => {
-  if (flightStore.getTotalFlights === 0) {
+  if (flightData.value.length === 0) {
     flightStore.loadFlights();
     setTimeout(() => {
       emit("update:paginatedData", paginatedFlights.value);
@@ -20,9 +24,9 @@ onMounted(() => {
 });
 
 //  คำนวณจำนวนหน้าทั้งหมด = จำนวนเที่ยวบิน ÷ จำนวนรายการต่อหน้า
-//  flightStore.getTotalFlights = 12, itemsPerPage = 6, totalPages = 2
+//  flightData.value.length = 12, itemsPerPage = 6, totalPages = 2
 const totalPages = computed(() =>
-  Math.ceil(flightStore.getTotalFlights / itemsPerPage)
+  Math.ceil(flightData.value.length / itemsPerPage)
 );
 
 //  คำนวณเที่ยวบินที่จะแสดงในหน้าปัจจุบัน

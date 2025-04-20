@@ -1,6 +1,7 @@
 export const flightData = [
   {
-    id: 1,
+    flightID: 1,
+    airlineID: "SG1234",
     isSeatAvailable: true,
     departure: {
       airport: "BKK",
@@ -8,76 +9,80 @@ export const flightData = [
     },
     destination: {
       time: "07:00",
-      airport: "CNX",
+      airport: "SG",
     },
     date: "Mar 09, 2024",
-    stops: {
+    duration: {
       time: "11hrs",
       stop: "1 Stop",
     },
-    aircraft: "Boeing 999-999",
-    status: "Pending",
+    aircraftID: "BOE001",
+    flightStatus: "Pending",
   },
   {
-    id: 2,
+    flightID: 2,
+    airlineID: "SG1234",
     isSeatAvailable: false,
     departure: {
       airport: "BKK",
       time: "18:00",
     },
     destination: {
-      time: "07:00",
-      airport: "CNX",
+      time: "09:00",
+      airport: "SG",
     },
     date: "Mar 09, 2024",
-    stops: {
+    duration: {
       time: "11hrs",
       stop: "1 Stop",
     },
-    aircraft: "Boeing 999-999",
-    status: "Completed",
+    aircraftID: "ABA001",
+    flightStatus: "Completed",
   },
   {
-    id: 3,
+    flightID: 3,
     isSeatAvailable: true,
+    airlineID: "SG1234",
     departure: {
       airport: "BKK",
       time: "18:00",
     },
     destination: {
-      time: "07:00",
-      airport: "CNX",
+      time: "13:00",
+      airport: "SG",
     },
     date: "Mar 09, 2024",
-    stops: {
+    duration: {
       time: "11hrs",
       stop: "1 Stop",
     },
-    aircraft: "Boeing 999-999",
-    status: "Pending",
+    aircraftID: "BOE001",
+    flightStatus: "Pending",
   },
   {
-    id: 4,
+    flightID: 4,
     isSeatAvailable: false,
+    airlineID: "SG1234",
     departure: {
       airport: "BKK",
       time: "18:00",
     },
     destination: {
-      time: "07:00",
-      airport: "CNX",
+      time: "14:00",
+      airport: "SG",
     },
     date: "Mar 09, 2024",
-    stops: {
+    duration: {
       time: "11hrs",
       stop: "1 Stop",
     },
-    aircraft: "Boeing 999-999",
-    status: "Delayed",
+    aircraftID: "ABA001",
+    flightStatus: "Delayed",
   },
   {
-    id: 5,
+    flightID: 5,
     isSeatAvailable: false,
+    airlineID: "TH5678",
     departure: {
       airport: "BKK",
       time: "18:00",
@@ -87,16 +92,17 @@ export const flightData = [
       airport: "CNX",
     },
     date: "Mar 09, 2024",
-    stops: {
+    duration: {
       time: "11hrs",
       stop: "1 Stop",
     },
-    aircraft: "Boeing 999-999",
-    status: "Canceled",
+    aircraftID: "BOE003",
+    flightStatus: "Canceled",
   },
   {
-    id: 6,
+    flightID: 6,
     isSeatAvailable: false,
+    airlineID: "TH5678",
     departure: {
       airport: "BKK",
       time: "18:00",
@@ -106,16 +112,17 @@ export const flightData = [
       airport: "CNX",
     },
     date: "Mar 09, 2024",
-    stops: {
+    duration: {
       time: "11hrs",
       stop: "1 Stop",
     },
-    aircraft: "Boeing 999-999",
-    status: "Canceled",
+    aircraftID: "ABA002",
+    flightStatus: "Canceled",
   },
   {
-    id: 7,
+    flightID: 7,
     isSeatAvailable: true,
+    airlineID: "TH5678",
     departure: {
       airport: "BKK",
       time: "18:00",
@@ -125,16 +132,17 @@ export const flightData = [
       airport: "CNX",
     },
     date: "Mar 09, 2024",
-    stops: {
+    duration: {
       time: "11hrs",
       stop: "1 Stop",
     },
-    aircraft: "Boeing 999-999",
-    status: "Pending",
+    aircraftID: "ABA002",
+    flightStatus: "Pending",
   },
   {
-    id: 8,
+    flightID: 8,
     isSeatAvailable: false,
+    airlineID: "TH5678",
     departure: {
       airport: "BKK",
       time: "18:00",
@@ -144,87 +152,91 @@ export const flightData = [
       airport: "CNX",
     },
     date: "Mar 09, 2024",
-    stops: {
+    duration: {
       time: "11hrs",
       stop: "1 Stop",
     },
-    aircraft: "Boeing 999-999",
-    status: "Completed",
+    aircraftID: "BOE003",
+    flightStatus: "Completed",
   },
   {
-    id: 9,
+    flightID: 9,
     isSeatAvailable: true,
+    airlineID: "JL9012",
     departure: {
       airport: "DMK",
       time: "10:00",
     },
     destination: {
-      time: "12:00",
-      airport: "HKT",
+      time: "15:00",
+      airport: "JPN",
     },
     date: "Mar 10, 2024",
-    stops: {
+    duration: {
       time: "2hrs",
       stop: "Non-stop",
     },
-    aircraft: "Airbus A320",
-    status: "Pending",
+    aircraftID: "BOE004",
+    flightStatus: "Pending",
   },
   {
-    id: 10,
+    flightID: 10,
     isSeatAvailable: false,
+    airlineID: "JL9012",
     departure: {
       airport: "DMK",
       time: "14:00",
     },
     destination: {
       time: "16:00",
-      airport: "HKT",
+      airport: "JPN",
     },
     date: "Mar 10, 2024",
-    stops: {
+    duration: {
       time: "2hrs",
       stop: "Non-stop",
     },
-    aircraft: "Airbus A320",
-    status: "Completed",
+    aircraftID: "BOE004",
+    flightStatus: "Completed",
   },
   {
-    id: 11,
+    flightID: 11,
     isSeatAvailable: true,
+    airlineID: "KE3456",
     departure: {
       airport: "CNX",
       time: "08:00",
     },
     destination: {
       time: "10:00",
-      airport: "BKK",
+      airport: "KR",
     },
     date: "Mar 11, 2024",
-    stops: {
+    duration: {
       time: "2hrs",
       stop: "Non-stop",
     },
-    aircraft: "Boeing 737",
-    status: "Pending",
+    aircraftID: "BOE002",
+    flightStatus: "Pending",
   },
   {
-    id: 12,
+    flightID: 12,
     isSeatAvailable: false,
+    airlineID: "KE3456",
     departure: {
       airport: "CNX",
       time: "12:00",
     },
     destination: {
       time: "14:00",
-      airport: "BKK",
+      airport: "KR",
     },
     date: "Mar 11, 2024",
-    stops: {
+    duration: {
       time: "2hrs",
       stop: "Non-stop",
     },
-    aircraft: "Boeing 737",
-    status: "Completed",
+    aircraftID: "BOE002",
+    flightStatus: "Completed",
   },
 ];

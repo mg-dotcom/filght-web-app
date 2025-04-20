@@ -1,14 +1,31 @@
 <script setup>
 import { ref, defineProps, defineEmits, watch } from "vue";
+import { useAircraftStore } from "@/stores/aircraftStore";
+import { useFlightStore } from "@/stores/flightStore";
+import { useAirlineStore } from "@/stores/airlineStore";
+import { onMounted } from "vue";
+
 import Dropdown from "../Dropdown.vue";
 
 const emit = defineEmits(["close"]);
+const aircraftStore = useAircraftStore();
+const airlineStore = useAirlineStore();
+const flightStore = useFlightStore();
 
 const props = defineProps({
   showAircraft: {
     type: Boolean,
     default: false,
   },
+  aircraftID: {
+    type: String,
+    default: "",
+  },
+});
+
+onMounted(() => {
+  aircraftStore.loadAircrafts();
+  airlineStore.loadAirlines();
 });
 
 const statusOptions = [
@@ -18,11 +35,11 @@ const statusOptions = [
 
 const form = ref({
   airline: "",
-  aircraftId: "",
+  aircraftID: "",
   capacity: 0,
   model: "",
   registrationNumber: "",
-  status: "",
+  aircraftStatus: "",
 });
 
 const originalForm = ref({});
@@ -34,6 +51,25 @@ watch(
       originalForm.value = JSON.parse(JSON.stringify(form.value));
     }
   }
+);
+
+// ดึงข้อมูลจาก store ตาม aircraftID ที่ส่งเข้ามา
+watch(
+  () => props.aircraftID,
+  (newID) => {
+    const aircraft = aircraftStore.getAircraftByID(newID);
+    const airlineNameShort = airlineStore.getAirlineByID(
+      aircraft?.airlineID
+    )?.name_short;
+    if (aircraft) {
+      form.value = {
+        ...form.value,
+        ...aircraft,
+        airline: airlineNameShort,
+      };
+    }
+  },
+  { immediate: true }
 );
 
 const handleClose = () => {
@@ -78,16 +114,18 @@ const handleClose = () => {
                   </svg>
                 </div>
               </div>
-              <h2>Boeing 999-999</h2>
-              <Dropdown v-model="form.status" :statusOptions="statusOptions">
+              <h2>{{ form.model || "No Model" }}</h2>
+              <Dropdown
+                v-model="form.aircraftStatus"
+                :statusOptions="statusOptions"
+              >
                 <template #trigger="{ selected }">
                   <span
                     :class="['badge', selected?.class?.toLowerCase()]"
                     v-if="selected"
                   >
-                    {{ selected.label }}
+                    {{ selected.label || form.aircraftStatus }}
                   </span>
-                  <span v-else>Select Status</span>
                 </template>
               </Dropdown>
             </div>
@@ -101,7 +139,7 @@ const handleClose = () => {
 
               <div class="form-row inputs">
                 <input type="text" v-model="form.airline" />
-                <input type="text" v-model="form.aircraftId" />
+                <input type="text" v-model="form.aircraftID" />
                 <input type="number" v-model="form.capacity" />
               </div>
 

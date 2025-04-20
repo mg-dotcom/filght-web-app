@@ -4,11 +4,11 @@ import FlightPagination from "@/components/management-flight/FlightPagination.vu
 import ModalAddFlight from "@/components/management-flight/ModalAddFlight.vue";
 import { ref, computed, onMounted } from "vue";
 import { useFlightStore } from "@/stores/flightStore";
+import { useAircraftStore } from "@/stores/aircraftStore";
 import { useRouter } from "vue-router";
 import Dropdown from "@/components/Dropdown.vue";
 import ModalAircraft from "@/components/management-flight/ModalAircraft.vue";
 
-const flightStore = useFlightStore();
 const tableHeaders = [
   { label: "SeatAvailable" },
   { label: "Departure" },
@@ -21,26 +21,28 @@ const tableHeaders = [
 ];
 
 const statusOptions = [
-  { label: "Open", value: "open", class: "completed" },
+  { label: "Canceled", value: "canceled", class: "canceled" },
   {
-    label: "Temporarily closed",
-    value: "temporarily-closed",
-    class: "canceled",
+    label: "Completed",
+    value: "completed",
+    class: "completed",
   },
   { label: "Pending", value: "pending", class: "pending" },
   { label: "Delayed", value: "delayed", class: "delayed" },
 ];
 
-// const flightStore = useFlightStore();
+const flightStore = useFlightStore();
+const aircraftStore = useAircraftStore();
 const router = useRouter();
 const showModal = ref(false);
 const showAircraft = ref(false);
 const status = ref("");
 const formMode = ref("");
+const selectedAircraftID = ref("");
 
-// โหลดข้อมูลเที่ยวบินเมื่อ component ถูก mount
 onMounted(() => {
   flightStore.loadFlights();
+  aircraftStore.loadAircrafts();
 });
 
 // ส่วนของ pageination เเละ sort data
@@ -53,18 +55,25 @@ const updatePaginatedFlights = (flights) => {
   paginatedFlights.value = flights;
 };
 
+const addFlight = (newFlight) => {
+  console.log("New Flight Data:", newFlight);
+};
+
 const showModalAddFlight = () => {
   showModal.value = true;
   formMode.value = "add";
 };
 
-const addFlight = (newFlight) => {
-  console.log("New Flight Data:", newFlight);
+const showModalInfoAircraft = (aircraftID) => {
+  selectedAircraftID.value = aircraftID;
+  showAircraft.value = true;
 };
 
-// Modal สำหรับแสดงข้อมูลเครื่องบิน
-const showModalAircraft = () => {
-  showAircraft.value = true;
+// Aircraft Model
+const formatAircraftModel = (aircraftID) => {
+  const model = aircraftStore.getAircraftByID(aircraftID)?.model || "";
+  const parts = model.split(" ");
+  return `${parts[0] ?? ""}<br/>${parts[1] ?? ""}`;
 };
 </script>
 
@@ -169,20 +178,20 @@ const showModalAircraft = () => {
           <div class="flight-cell route-cell">
             <div class="flight-line">
               <p>
-                {{ flight.stops.time }}
+                {{ flight.duration.time }}
               </p>
               <div class="line">
                 <img
                   src="/dashboard-pic/icons/plane-icon.png"
                   :class="{
-                    animate: flight.status === 'Pending',
-                    center: flight.status !== 'Pending',
+                    animate: flight.flightStatus === 'Pending',
+                    center: flight.flightStatus !== 'Pending',
                   }"
                   alt=""
                 />
               </div>
               <p>
-                {{ flight.stops.stop }}
+                {{ flight.duration.stop }}
               </p>
             </div>
           </div>
@@ -210,23 +219,22 @@ const showModalAircraft = () => {
 
           <div
             class="flight-cell aircraft-cell"
-            @click="showModalAircraft(flight.aircraft)"
+            @click="showModalInfoAircraft(flight.aircraftID)"
           >
-            {{ flight.aircraft.split(" ")[0] }}<br />
-            {{ flight.aircraft.split(" ")[1] }}
+            <p v-html="formatAircraftModel(flight.aircraftID)"></p>
           </div>
 
           <div class="flight-cell status-cell">
             <span
               class="status-badge"
               :class="{
-                'status-completed': flight.status === 'Completed',
-                'status-canceled': flight.status === 'Canceled',
-                'status-pending': flight.status === 'Pending',
-                'status-delayed': flight.status === 'Delayed',
+                'status-completed': flight.flightStatus === 'Completed',
+                'status-canceled': flight.flightStatus === 'Canceled',
+                'status-pending': flight.flightStatus === 'Pending',
+                'status-delayed': flight.flightStatus === 'Delayed',
               }"
             >
-              {{ flight.status }}
+              {{ flight.flightStatus }}
             </span>
           </div>
 
@@ -259,6 +267,7 @@ const showModalAircraft = () => {
   </ManagementOverview>
   <ModalAircraft
     :showAircraft="showAircraft"
+    :aircraftID="selectedAircraftID"
     @close="showAircraft = false"
   ></ModalAircraft>
 
