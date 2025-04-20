@@ -20,8 +20,12 @@ defineProps({
 const mode = ref("");
 
 const statusOptions = [
-  { value: "open", label: "Open" },
-  { value: "temporarily-closed", label: "Temporarily closed" },
+  { value: "open", label: "Open", class: "open" },
+  {
+    value: "temporarily-closed",
+    label: "Temporarily closed",
+    class: "temporarily-closed",
+  },
 ];
 
 // form data
@@ -248,7 +252,7 @@ onBeforeUnmount(() => {
               <Dropdown v-model="status" :statusOptions="statusOptions">
                 <template #trigger="{ selected }">
                   <span
-                    :class="['badge', selected?.value?.toLowerCase()]"
+                    :class="['badge', selected?.class?.toLowerCase()]"
                     v-if="selected"
                   >
                     {{ selected.label }}

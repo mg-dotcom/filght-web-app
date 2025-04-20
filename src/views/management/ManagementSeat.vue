@@ -1,6 +1,7 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import ManagementOverview from "@/components/ManagementOverview.vue";
+import Dropdown from "@/components/Dropdown.vue";
 import { useRouter } from "vue-router";
 import {
   seatData,
@@ -15,15 +16,42 @@ import {
   formatSeatId,
 } from "@/data/management-seat.js";
 
-const isStatusDropdownOpen = ref(false);
+const router = useRouter();
 
 const selectedClassTypeId = ref("economy");
+const selectedPassengerSeat = ref(null);
+const isStatusDropdownOpen = ref(false);
+const isEditPassengerSeat = ref(false);
+const editAreaRef = ref(null);
+const statusAllSeats = ref("");
 
-const toggleStatusDropdown = () => {
-  isStatusDropdownOpen.value = !isStatusDropdownOpen.value;
-};
+const statusOptionsSeat = [
+  { value: true, label: "Checked-In", class: "checked-in" },
+  { value: false, label: "Not Checked-In", class: "not-checked-in" },
+];
+
+const statusOptionsAllSeats = [
+  { value: "available", label: "Available", class: "available" },
+  { value: "not-available", label: "Not Available", class: "not-available" },
+];
+
+const seatsByClass = computed(() => {
+  switch (selectedClassTypeId.value) {
+    case "economy":
+      return economySeatsData;
+    case "business":
+      return businessSeatsData;
+    case "first-class":
+      return firstClassSeatsData;
+    default:
+      return [];
+  }
+});
+
+const rowsByClass = computed(() => getUniqueRows(seatsByClass.value));
 
 const selectClassType = (classTypeId) => {
+  if (classTypeId === selectedClassTypeId.value) return;
   selectedClassTypeId.value = classTypeId;
   clearSelectedSeat();
 };
@@ -31,11 +59,17 @@ const selectClassType = (classTypeId) => {
 const clearSelectedSeat = () => {
   selectedPassengerSeat.value = null;
   isStatusDropdownOpen.value = false;
+  isEditPassengerSeat.value = false;
 };
 
-const selectedPassengerSeat = ref(null);
+const editPassengerSeat = (event) => {
+  event?.stopPropagation();
+  isEditPassengerSeat.value = !isEditPassengerSeat.value;
+};
 
 const selectSeat = (rowNum, col) => {
+  isEditPassengerSeat.value = false;
+
   const seatId = formatSeatId(rowNum, col);
   const classType = formatSelectedClassTypeId(selectedClassTypeId.value);
 
@@ -45,10 +79,8 @@ const selectSeat = (rowNum, col) => {
 
   if (!seat) return;
 
-  // ถ้าที่นั่งมีสถานะเป็น available = Unreserved ไม่สามารถเลือกได้
   if (seat.status === "available") return;
 
-  // ถ้ากดที่นั่งเดิมซ้ำ = ยกเลิกการเลือก
   if (selectedPassengerSeat.value?.id === seat.id) {
     selectedPassengerSeat.value = null;
   } else {
@@ -59,19 +91,21 @@ const selectSeat = (rowNum, col) => {
   }
 };
 
-const seatsByClass = computed(() => {
-  if (selectedClassTypeId.value === "economy") return economySeatsData;
-  if (selectedClassTypeId.value === "business") return businessSeatsData;
-  if (selectedClassTypeId.value === "first-class") return firstClassSeatsData;
-  return [];
+const handleClickOutside = (event) => {
+  if (selectedPassengerSeat.value && isEditPassengerSeat.value) {
+    if (editAreaRef.value && !editAreaRef.value.contains(event.target)) {
+      isEditPassengerSeat.value = false;
+    }
+  }
+};
+
+onMounted(() => {
+  document.addEventListener("click", handleClickOutside);
 });
 
-// แสดงแถวที่มีใน class นั้นๆ
-const rowsByClass = computed(() => {
-  return getUniqueRows(seatsByClass.value);
+onUnmounted(() => {
+  document.removeEventListener("click", handleClickOutside);
 });
-
-const router = useRouter();
 </script>
 
 <template>
@@ -179,13 +213,20 @@ const router = useRouter();
         </div>
 
         <div class="status-selector">
-          <button class="status-button" @click="toggleStatusDropdown">
-            Select Status
-            <span
-              class="dropdown-icon"
-              :class="{ open: isStatusDropdownOpen }"
-            ></span>
-          </button>
+          <Dropdown
+            v-model="statusAllSeats"
+            :statusOptions="statusOptionsAllSeats"
+          >
+            <template #trigger="{ selected }">
+              <span
+                v-if="selected"
+                :class="['badge', selected?.class?.toLowerCase()]"
+              >
+                {{ selected.label }}
+              </span>
+              <span v-else>Select Status</span>
+            </template>
+          </Dropdown>
 
           <div class="status-dropdown" v-if="isStatusDropdownOpen">
             <div class="status-option available">
@@ -214,7 +255,13 @@ const router = useRouter();
                 <div>
                   Seat <strong>{{ selectedPassengerSeat.id }}</strong>
                 </div>
-                <button class="edit-btn">Edit</button>
+                <button
+                  class="edit-btn"
+                  :class="{ active: isEditPassengerSeat }"
+                  @click="editPassengerSeat"
+                >
+                  Edit
+                </button>
               </template>
               <template v-else> Select Your Seat </template>
             </div>
@@ -223,13 +270,30 @@ const router = useRouter();
               <template v-if="selectedPassengerSeat">
                 <div class="status-line">
                   Check-In Status :
-                  <span class="checked-in">
+                  <span class="checked-in" v-if="!isEditPassengerSeat">
                     {{
                       selectedPassengerSeat.isCheckedIn === true
                         ? "Checked In"
                         : "Not Checked In"
                     }}
                   </span>
+                  <Dropdown
+                    class="status-dropdow-edit"
+                    v-else
+                    v-model="selectedPassengerSeat.isCheckedIn"
+                    :statusOptions="statusOptionsSeat"
+                  >
+                    <template #trigger="{ selected }">
+                      <span :class="['badge', selected?.class]">
+                        {{
+                          selected?.label ||
+                          (selectedPassengerSeat.isCheckedIn
+                            ? "Checked In"
+                            : "Not Checked In")
+                        }}
+                      </span>
+                    </template>
+                  </Dropdown>
                 </div>
               </template>
               <template v-else>
@@ -520,107 +584,6 @@ const router = useRouter();
   opacity: 0.7;
 }
 
-/* ส่วนของ status selector */
-.status-selector {
-  position: relative;
-}
-
-.status-button {
-  padding: 10px 25px;
-  border: 1px solid var(--c-navy-light);
-  border-radius: 10px;
-  background: white;
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  cursor: pointer;
-  color: var(--c-navy-light);
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.status-button:hover {
-  background-color: var(--c-navy-light);
-  color: white;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.status-button:active {
-  background-color: var(--c-navy-light);
-  color: white;
-  transform: scale(0.98);
-  transition: transform 0.1s ease;
-}
-
-.dropdown-icon {
-  margin-left: 8px;
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-right: 2px solid currentColor; /* currentColor makes it white on hover */
-  border-bottom: 2px solid currentColor;
-  transform: rotate(45deg);
-  transition: transform 0.3s ease, border-color 0.3s ease;
-}
-
-.dropdown-icon.open {
-  transform: rotate(-135deg);
-}
-.status-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  margin-top: 5px;
-  border: 1px solid var(--c-navy-light);
-  border-radius: 8px;
-  background: white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  justify-content: center;
-  z-index: 10;
-  overflow: hidden;
-}
-
-.status-option {
-  padding: 7px 0;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  color: var(--c-navy-light);
-  cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  border-bottom: 1px solid var(--c-navy-light);
-}
-
-.status-option:hover {
-  background-color: #f5f3f3;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.status-option span {
-  font-size: 0.7rem;
-  font-weight: 600;
-}
-
-.status-option:last-child {
-  border-bottom: none;
-}
-
-.status-option.available span {
-  background-color: var(--c-dark-navy, #e0e8f0);
-  color: var(--c-soft-blue, #2d4b6d);
-  padding: 4px 25px;
-  border-radius: 15px;
-}
-
-.status-option.not-available span {
-  background-color: var(--c-soft-blue, #e0e8f0);
-  color: var(--c-navy, #2d4b6d);
-  padding: 4px 25px;
-  border-radius: 15px;
-}
-
 /* ส่วนของ management seat content */
 .management-seat-content {
   grid-template-columns: 1fr 1.5fr;
@@ -635,6 +598,7 @@ const router = useRouter();
   border-radius: 12px;
   overflow: hidden;
   width: 100%;
+  height: 120px;
   display: flex;
   flex-direction: column;
 }
@@ -654,10 +618,6 @@ const router = useRouter();
   justify-content: center;
   align-items: center;
   gap: 8px;
-}
-
-.edit-btn {
-  display: none; /* ซ่อนไว้ก่อนเลือก */
 }
 
 /* หลังเลือก */
@@ -688,6 +648,12 @@ const router = useRouter();
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+.select-seat.active .edit-btn.active {
+  background-color: white;
+  color: #f59e0b;
+  transition: background-color 0.3s ease-out, color 0.3s ease-out;
+}
+
 /* Content เหมือนเดิม */
 .select-seat-content {
   background-color: var(--c-white, #ffffff);
@@ -701,10 +667,25 @@ const router = useRouter();
 }
 
 /* Status */
+.status-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  gap: 10px;
+  color: var(--vt-c-gray);
+  line-height: 1.2;
+  position: absolute;
+  z-index: 1;
+}
+
+.status-dropdow-edit {
+  position: relative;
+  top: 100%;
+}
 
 .checked-in {
   display: inline-block;
-  margin-left: 8px;
   background-color: #fff7ed;
   color: #f59e0b;
   padding: 3px 12px;

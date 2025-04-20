@@ -20,10 +20,10 @@ defineProps({
 const mode = ref("");
 
 const statusOptions = [
-  { value: "pending", label: "Pending" },
-  { value: "delayed", label: "Delayed" },
-  { value: "completed", label: "Completed" },
-  { value: "canceled", label: "Canceled" },
+  { value: "pending", label: "Pending", class: "pending" },
+  { value: "delayed", label: "Delayed", class: "delayed" },
+  { value: "completed", label: "Completed", class: "completed" },
+  { value: "canceled", label: "Canceled", class: "canceled" },
 ];
 
 // form data
@@ -143,7 +143,7 @@ const closeModal = () => {
               <Dropdown v-model="status" :statusOptions="statusOptions">
                 <template #trigger="{ selected }">
                   <span
-                    :class="['badge', selected?.value?.toLowerCase()]"
+                    :class="['badge', selected?.class?.toLowerCase()]"
                     v-if="selected"
                   >
                     {{ selected.label }}

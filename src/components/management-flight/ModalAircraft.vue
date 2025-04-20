@@ -12,8 +12,8 @@ const props = defineProps({
 });
 
 const statusOptions = [
-  { value: "available", label: "Available" },
-  { value: "not-available", label: "Not Available" },
+  { value: "available", label: "Available", class: "available" },
+  { value: "not-available", label: "Not Available", class: "not-available" },
 ];
 
 const form = ref({
@@ -82,7 +82,7 @@ const handleClose = () => {
               <Dropdown v-model="form.status" :statusOptions="statusOptions">
                 <template #trigger="{ selected }">
                   <span
-                    :class="['badge', selected?.value?.toLowerCase()]"
+                    :class="['badge', selected?.class?.toLowerCase()]"
                     v-if="selected"
                   >
                     {{ selected.label }}

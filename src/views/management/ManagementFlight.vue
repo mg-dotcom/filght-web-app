@@ -19,9 +19,16 @@ const tableHeaders = [
   { label: "Status" },
   { label: "Action" },
 ];
+
 const statusOptions = [
-  { label: "Open", value: "open" },
-  { label: "Temporarily closed", value: "temporarily-closed" },
+  { label: "Open", value: "open", class: "completed" },
+  {
+    label: "Temporarily closed",
+    value: "temporarily-closed",
+    class: "canceled",
+  },
+  { label: "Pending", value: "pending", class: "pending" },
+  { label: "Delayed", value: "delayed", class: "delayed" },
 ];
 
 // const flightStore = useFlightStore();
@@ -83,7 +90,7 @@ const showModalAircraft = () => {
         <Dropdown v-model="status" :statusOptions="statusOptions">
           <template #trigger="{ selected }">
             <span
-              :class="['badge', selected?.value?.toLowerCase()]"
+              :class="['badge', selected?.class?.toLowerCase()]"
               v-if="selected"
             >
               {{ selected.label }}

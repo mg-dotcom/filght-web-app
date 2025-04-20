@@ -13,21 +13,21 @@ const flightData = computed(() => flightStore.getAllFlights);
 const tableHeaders = [
   {
     label: "SeatAvailable",
-    key: "isSeatAvailable",
     filter: true,
     center: true,
   },
-  { label: "Departure", key: "departure.airport", filter: true },
-  { label: "", key: null, filter: false },
-  { label: "Destination", key: "destination.airport", filter: true },
-  { label: "Date", key: "date", filter: true },
-  { label: "Aircraft", key: "aircraft", filter: true },
-  { label: "Status", key: "status", filter: true },
-  { label: "Action", key: null, filter: false },
+  { label: "Departure", filter: true },
+  { label: "", filter: false },
+  { label: "Destination", filter: true },
+  { label: "Date", filter: true },
+  { label: "Aircraft", filter: true },
+  { label: "Status", filter: true },
+  { label: "Action", filter: false },
 ];
+
 const statusOptions = [
-  { label: "Open", value: "open" },
-  { label: "Temporarily closed", value: "temporarily-closed" },
+  { label: "Open", value: "open", class: "open" },
+  { label: "Temporarily closed", value: "temporarily-closed", class: "temporarily-closed" },
 ];
 
 // const flightStore = useFlightStore();
@@ -146,7 +146,7 @@ const showModalAircraft = () => {
         <Dropdown v-model="status" :statusOptions="statusOptions">
           <template #trigger="{ selected }">
             <span
-              :class="['badge', selected?.value?.toLowerCase()]"
+              :class="['badge', selected?.class?.toLowerCase()]"
               v-if="selected"
             >
               {{ selected.label }}

@@ -2,9 +2,14 @@
 import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 
 const props = defineProps({
-  modelValue: String,
+  modelValue: {
+    type: [String, Boolean],
+    required: true,
+  },
   statusOptions: {
     type: Array,
+    required: true,
+    default: () => [],
   },
 });
 
@@ -35,9 +40,12 @@ onBeforeUnmount(() => {
   window.removeEventListener("click", handleClickOutside);
 });
 
-const selectedOption = computed(() =>
-  props.statusOptions.find((opt) => opt.value === props.modelValue)
-);
+const selectedOption = computed(() => {
+  if (!props.statusOptions || !Array.isArray(props.statusOptions)) {
+    return null;
+  }
+  return props.statusOptions.find((opt) => opt.value === props.modelValue);
+});
 </script>
 
 <template>
@@ -60,7 +68,7 @@ const selectedOption = computed(() =>
       <div
         v-for="(option, index) in statusOptions"
         :key="index"
-        :class="['status-option', option.value.toLowerCase()]"
+        :class="['status-option', String(option.class).toLowerCase()]"
         @click="selectOption(option.value)"
       >
         <span>{{ option.label }}</span>
@@ -201,6 +209,12 @@ const selectedOption = computed(() =>
   color: var(--c-navy, #2d4b6d);
 }
 
+.status-option.checked-in span,
+.status-option.not-checked-in span {
+  background-color: var(--c-light-orange);
+  color: var(--c-orange);
+}
+
 .status-option:last-child {
   border-bottom: none;
 }
@@ -230,7 +244,6 @@ const selectedOption = computed(() =>
   background-color: var(--c-soft-orange);
   color: var(--c-light-orange);
 }
-
 :deep(.badge.open) {
   background-color: var(--c-dark-navy, #e0e8f0);
   color: var(--c-soft-blue, #2d4b6d);
@@ -249,5 +262,11 @@ const selectedOption = computed(() =>
 :deep(.badge.not-available) {
   background-color: var(--c-soft-blue, #e0e8f0);
   color: var(--c-navy, #2d4b6d);
+}
+
+:deep(.badge.checked-in),
+:deep(.badge.not-checked-in) {
+  background-color: var(--c-light-orange);
+  color: var(--c-orange);
 }
 </style>
