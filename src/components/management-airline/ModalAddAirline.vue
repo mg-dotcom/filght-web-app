@@ -30,14 +30,17 @@ const statusOptions = [
 
 // form data
 const form = ref({
-  airlineImage: null,
-  airlineName: "",
+  airlineID: "",
+  name: "",
+  name_short: "",
   code: "",
   contactPrefix: "",
   contactNumber: "",
   country: "",
   headquarters: "",
+  airlineImage: null,
   airlineStatus: "",
+  airlineColor: "#ffffff",
 });
 
 const confirmAddFlight = () => {
@@ -66,61 +69,7 @@ const closeModal = () => {
 
 // ส่วนของการอัปโหลดรูปภาพ
 const uploadInputRef = ref(null);
-
-// เมื่อ ฺBackend เสร็จเเล้ว ให้ใช้โค้ดนี้แทน
-// const openUploadImageAirline = () => {
-//   if (!uploadInputRef.value) {
-//     const input = document.createElement("input");
-//     input.type = "file";
-//     input.accept = "image/*";
-//     input.style.display = "none";
-//     input.onchange = handleImageUpload;
-//     document.body.appendChild(input);
-//     uploadInputRef.value = input;
-//   }
-
-//   uploadInputRef.value.click();
-// };
-
-// const handleImageUpload = async (event) => {
-//   const file = event.target.files[0];
-//   if (!file) return;
-
-//   try {
-//     // สร้าง FormData สำหรับส่งไฟล์
-//     const formData = new FormData();
-//     formData.append("image", file);
-
-//     // ส่งไฟล์ไปยัง API endpoint สำหรับอัปโหลดรูปภาพ
-//     const response = await fetch("/api/upload-image", {
-//       method: "POST",
-//       body: formData,
-//     });
-
-//     if (!response.ok) {
-//       throw new Error("การอัปโหลดรูปภาพล้มเหลว");
-//     }
-
-//     // รับ path ของรูปภาพที่อัปโหลดแล้วจาก backend
-//     const result = await response.json();
-//     const imagePath = result.imagePath; // เช่น "/uploads/airlines/image-1234567890.jpg"
-
-//     // เก็บ path ของรูปภาพ
-//     airlineImage.value = imagePath;
-
-//     // แสดงรูปภาพใน .pic element
-//     const picElement = document.querySelector(".pic");
-//     if (picElement) {
-//       picElement.style.backgroundImage = `url(${imagePath})`;
-//       picElement.style.backgroundSize = "cover";
-//       picElement.style.backgroundPosition = "center";
-//     }
-//   } catch (error) {
-//     console.error("Error occur:", error);
-//   } finally {
-//     event.target.value = ""; // รีเซ็ตค่า input เพื่อให้สามารถเลือกไฟล์เดิมได้อีก
-//   }
-// };
+const imagePreviewRef = ref(null);
 
 const openUploadImageAirline = () => {
   if (!uploadInputRef.value) {
@@ -143,22 +92,19 @@ const handleImageUpload = (event) => {
   const reader = new FileReader();
   reader.onload = (e) => {
     const imageDataUrl = e.target.result;
-    // จำลอง path
+    // จำลอง path ที่จะแสดงใน backend
     const mockImagePath = `/uploads/airlines/${file.name}`;
-    form.value.airlineImage = mockImagePath;
+    console.log("mockImagePath:", mockImagePath);
+    form.value.airlineImage = imageDataUrl;
 
-    const picElement = document.querySelector(".pic");
-    console.log("picElement:", picElement);
-
-    if (picElement) {
+    if (imagePreviewRef.value) {
       setTimeout(() => {
-        picElement.style.backgroundImage = `url(${imageDataUrl})`;
-        picElement.style.backgroundSize = "cover";
-        picElement.style.backgroundPosition = "center";
-        console.log("ตั้งค่า background เรียบร้อย");
+        imagePreviewRef.value.style.backgroundImage = `url(${imageDataUrl})`;
+        imagePreviewRef.value.style.backgroundSize = "cover";
+        imagePreviewRef.value.style.backgroundPosition = "center";
       }, 10);
     } else {
-      console.error("ไม่พบองค์ประกอบที่มี class 'pic'");
+      console.error("ไม่พบองค์ประกอบที่มี imagePreviewRef.value");
     }
   };
 
@@ -251,7 +197,8 @@ onBeforeUnmount(() => {
               <div class="profile-pic-wrapper">
                 <div class="pic-container">
                   <div
-                    class="pic"
+                    ref="imagePreviewRef"
+                    class="pic-image"
                     :style="`background-image: url(${form.airlineImage})`"
                   ></div>
                 </div>
@@ -283,11 +230,12 @@ onBeforeUnmount(() => {
                 <div
                   class="form-row"
                   style="
-                    grid-template-columns: 1fr 1fr;
+                    grid-template-columns: 0.5fr 1fr 1fr;
                     gap: 20px;
                     align-items: center;
                   "
                 >
+                  <label>Airline ID</label>
                   <label>Airline Name</label>
                   <label>Code</label>
                 </div>
@@ -295,15 +243,20 @@ onBeforeUnmount(() => {
                 <div
                   class="form-row inputs"
                   style="
-                    grid-template-columns: 1fr 1fr;
+                    grid-template-columns: 0.5fr 1fr 1fr;
                     gap: 20px;
                     align-items: center;
                   "
                 >
                   <input
                     type="text"
+                    placeholder="- - - - - "
+                    v-model="form.airlineID"
+                  />
+                  <input
+                    type="text"
                     placeholder="Enter Airline Name"
-                    v-model="form.airlineName"
+                    v-model="form.name"
                   />
                   <input type="text" placeholder="- -" v-model="form.code" />
                 </div>
@@ -345,13 +298,38 @@ onBeforeUnmount(() => {
                   />
                 </div>
 
-                <div class="form-row">
+                <div
+                  class="form-row"
+                  style="
+                    grid-template-columns: 0.8fr 1fr 2fr;
+                    gap: 20px;
+                    align-items: center;
+                  "
+                >
+                  <label>Name Short</label>
+                  <label>Airline Color</label>
                   <label>Headquarters</label>
                 </div>
 
-                <div class="form-row inputs">
+                <div
+                  class="form-row inputs"
+                  style="
+                    grid-template-columns: 0.8fr 1fr 2fr;
+                    gap: 20px;
+                    align-items: center;
+                  "
+                >
                   <input
-                    style="grid-column: span 3"
+                    type="text"
+                    placeholder="- - -"
+                    v-model="form.name_short"
+                  />
+                  <input
+                    type="color"
+                    v-model="form.airlineColor"
+                    style="width: 100%; height: 100%"
+                  />
+                  <input
                     type="text"
                     placeholder="Enter Headquarters of Airline"
                     v-model="form.headquarters"
@@ -437,7 +415,7 @@ onBeforeUnmount(() => {
   border: 1px solid var(--c-navy-light);
   border-radius: 10px;
   width: 100%;
-  max-width: 750px;
+  max-width: 760px;
   padding: 35px;
   font-family: Arial, sans-serif;
   position: relative;
@@ -614,7 +592,7 @@ onBeforeUnmount(() => {
   flex-shrink: 0;
 }
 
-.pic {
+.pic-image {
   width: 100%;
   height: 100%;
   background-size: cover;

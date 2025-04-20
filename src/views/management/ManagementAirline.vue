@@ -1,16 +1,22 @@
 <script setup>
-import { airlines } from "@/data/management-airline.js";
+import { airlineData } from "@/data/management-airline.js";
 import ModalAddAirline from "@/components/management-airline/ModalAddAirline.vue";
+import { useAirlineStore } from "@/stores/airlineStore";
 import { useRouter } from "vue-router";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 
+const airlineStore = useAirlineStore();
 const router = useRouter();
 const isShowModalAddAirline = ref(false);
 
-const addFlight = (airline) => {
-  isShowModalAddAirline.value = false;
+onMounted(() => {
+  airlineStore.loadAirlines();
+});
 
-  console.log("Airline added:", airline);
+const addFlight = (airline) => {
+  console.log(airline);
+  airlineStore.addAirline(airline);
+  isShowModalAddAirline.value = false;
 };
 
 const showModalAddAirline = () => {
@@ -46,7 +52,7 @@ const showModalAddAirline = () => {
 
     <div class="airline-cards">
       <div
-        v-for="(airline, index) in airlines"
+        v-for="(airline, index) in airlineStore.getAllAirlines()"
         :key="index"
         class="airline-card"
         :style="{
@@ -55,16 +61,11 @@ const showModalAddAirline = () => {
       >
         <!-- SECTION 1: Header -->
         <div class="card-section logo-section" style="grid-area: logo">
-          <div
-            class="airline-logo"
-            :style="{
-              backgroundColor: airline.airlineColor,
-            }"
-          >
-            <img
-              src="/management-pic/management-airline/airplane-header-icon.png"
-              alt="Airline Logo"
-            />
+          <div class="airline-logo">
+            <div
+              class="pic"
+              :style="`background-image: url(${airline.airlineImage})`"
+            ></div>
           </div>
         </div>
 
@@ -82,7 +83,7 @@ const showModalAddAirline = () => {
             "
           >
             <h3>{{ airline.name }}</h3>
-            <p>#{{ airline.id }}</p>
+            <p>#{{ airline.airlineID }}</p>
           </div>
         </div>
 
@@ -113,7 +114,9 @@ const showModalAddAirline = () => {
             </div>
             <div class="info-item">
               <p class="info-label">Contact</p>
-              <p class="info-value">{{ airline.contact }}</p>
+              <p class="info-value">
+                {{ airline.contactPrefix + " " + airline.contactNumber }}
+              </p>
             </div>
           </div>
         </div>
@@ -122,17 +125,17 @@ const showModalAddAirline = () => {
         <div class="card-section airline-icon-section" style="grid-area: icon">
           <div class="airline-plane-icon">
             <img
-              v-if="airline.status === 'active'"
+              v-if="airline.airlineStatus === 'open'"
               src="/management-pic/management-airline/airplane-active-icon.png"
-              alt=""
+              alt="Open Airline"
             />
-            <div v-else-if="airline.status === 'temporarily_closed'">
+            <div v-else-if="airline.airlineStatus === 'temporarily-closed'">
               <div class="status-closed">
                 <p>Temporarily Close</p>
               </div>
               <img
                 src="/management-pic/management-airline/airplane-inactive-icon.png"
-                alt=""
+                alt="Temporarily Closed Airline"
               />
             </div>
           </div>
@@ -230,22 +233,32 @@ const showModalAddAirline = () => {
 }
 
 .airline-logo {
-  border: 3px solid white;
   border-radius: 50%;
   position: relative;
   bottom: -12px;
-  padding: 10px;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 2;
+  position: relative;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 70px;
   height: 70px;
+  border: 3px solid white;
+  overflow: hidden;
+  flex-shrink: 0;
   z-index: 2;
 }
 
-.airline-logo img {
-  width: 45px;
-  height: 45px;
+.pic {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
 }
 
 .airline-title {

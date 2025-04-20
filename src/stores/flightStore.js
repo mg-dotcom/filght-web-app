@@ -18,16 +18,5 @@ export const useFlightStore = defineStore("flight", {
     loadFlights() {
       this.flights = flightData;
     },
-
-    // selectFlight(flightId) {
-    //   this.selectedFlight = this.flights.find((f) => f.id === flightId);
-    // },
-
-    // updateFlightStatus(flightId, isAvailable) {
-    //   const flight = this.flights.find((f) => f.id === flightId);
-    //   if (flight) {
-    //     flight.isSeatAvailable = isAvailable;
-    //   }
-    // },
   },
 });
