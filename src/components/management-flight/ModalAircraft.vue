@@ -1,50 +1,58 @@
 <script setup>
-import { ref, defineProps, defineEmits, onMounted, onBeforeUnmount } from "vue";
-import ModalConfirm from "../ModalConfirm.vue";
+import { ref, defineProps, defineEmits, watch } from "vue";
 import Dropdown from "../Dropdown.vue";
 
 const emit = defineEmits(["close"]);
-const isShowConfirmModal = ref(false);
 
-defineProps({
+const props = defineProps({
   showAircraft: {
     type: Boolean,
     default: false,
   },
 });
 
-const mode = ref("");
-
 const statusOptions = [
   { value: "available", label: "Available" },
   { value: "not-available", label: "Not Available" },
 ];
 
-// form data
-const airline = ref("");
-const aircraftId = ref("");
-const capacity = ref(0);
+const form = ref({
+  airline: "",
+  aircraftId: "",
+  capacity: 0,
+  model: "",
+  registrationNumber: "",
+  status: "",
+});
 
-const model = ref("");
-const registrationNumber = ref("");
+const originalForm = ref({});
 
-// Status
-const status = ref("");
+watch(
+  () => props.showAircraft,
+  (newVal) => {
+    if (newVal) {
+      originalForm.value = JSON.parse(JSON.stringify(form.value));
+    }
+  }
+);
 
-const discardAddFlight = () => {
+const handleClose = () => {
+  if (form.value.status !== originalForm.value.status) {
+    console.log("ส่ง status ใหม่:", form.value.status);
+  }
   emit("close");
 };
 </script>
 
 <template>
   <Transition name="modal-container">
-    <div v-if="showAircraft" class="modal-container" @click.self="closeModal">
+    <div v-if="showAircraft" class="modal-container" @click.self="handleClose">
       <div class="modal-content">
         <div>
           <div class="modal-add-flight">
             <div class="modal-header">
               <div class="modal-action">
-                <div class="check-button" @click="discardAddFlight">
+                <div class="check-button" @click="handleClose">
                   <svg
                     width="30"
                     height="30"
@@ -71,7 +79,7 @@ const discardAddFlight = () => {
                 </div>
               </div>
               <h2>Boeing 999-999</h2>
-              <Dropdown v-model="status" :statusOptions="statusOptions">
+              <Dropdown v-model="form.status" :statusOptions="statusOptions">
                 <template #trigger="{ selected }">
                   <span
                     :class="['badge', selected?.value?.toLowerCase()]"
@@ -92,9 +100,9 @@ const discardAddFlight = () => {
               </div>
 
               <div class="form-row inputs">
-                <input type="text" v-model="airline" />
-                <input type="text" v-model="aircraftId" />
-                <input type="number" v-model="capacity" />
+                <input type="text" v-model="form.airline" />
+                <input type="text" v-model="form.aircraftId" />
+                <input type="number" v-model="form.capacity" />
               </div>
 
               <div
@@ -117,8 +125,8 @@ const discardAddFlight = () => {
                   align-items: center;
                 "
               >
-                <input type="text" v-model="model" />
-                <input type="text" v-model="registrationNumber" />
+                <input type="text" v-model="form.model" />
+                <input type="text" v-model="form.registrationNumber" />
               </div>
             </div>
           </div>
@@ -126,32 +134,6 @@ const discardAddFlight = () => {
       </div>
     </div>
   </Transition>
-  <!-- Confirmation Modal -->
-  <ModalConfirm
-    :mode="mode"
-    :isShowConfirmModal="isShowConfirmModal"
-    @closeConfirmModal="isShowConfirmModal = false"
-    @closeModal="closeModal"
-  >
-    <template #header>
-      {{ mode === "success" ? "Success Confirmation" : "Discard Confirmation" }}
-    </template>
-    <template #body>
-      <p>
-        {{
-          mode === "success"
-            ? "Are you sure you want to add this flight?"
-            : "Are you sure you want to discard this flight?"
-        }}
-      </p>
-    </template>
-    <template #footer-summit>
-      <p>Yes</p>
-    </template>
-    <template #footer-cancel>
-      <div>Cancel</div>
-    </template>
-  </ModalConfirm>
 </template>
 
 <style scoped>

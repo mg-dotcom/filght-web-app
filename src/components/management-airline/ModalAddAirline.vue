@@ -78,7 +78,7 @@ const closeModal = () => {
   emit("close");
 };
 
-// ประกาศตัวแปรให้ถูกต้อง
+// ส่วนของการอัปโหลดรูปภาพ
 const uploadInputRef = ref(null);
 
 // เมื่อ ฺBackend เสร็จเเล้ว ให้ใช้โค้ดนี้แทน
@@ -154,38 +154,30 @@ const handleImageUpload = (event) => {
   const file = event.target.files[0];
   if (!file) return;
 
-  // เก็บไฟล์ไว้ในตัวแปรชั่วคราวเพื่อใช้ในการแสดงผล
   const reader = new FileReader();
   reader.onload = (e) => {
     const imageDataUrl = e.target.result;
-
-    // จำลองการได้รับ path กลับมาจาก server
-    // ในสถานการณ์จริง path จะถูกสร้างและส่งกลับมาจาก backend
+    // จำลอง path
     const mockImagePath = `/uploads/airlines/${file.name}`;
-
-    // เก็บ mock path
     airlineImage.value = mockImagePath;
 
-    console.log("Mock uploaded image path:", mockImagePath);
-
-    // แสดงรูปภาพใน .pic element (ใช้ Data URL ชั่วคราว)
     const picElement = document.querySelector(".pic");
-    if (picElement) {
-      // ใช้ Data URL เพื่อแสดงผลในขณะที่ทำ mock
-      picElement.style.backgroundImage = `url(${imageDataUrl})`;
-      picElement.style.backgroundSize = "cover";
-      picElement.style.backgroundPosition = "center";
-    }
+    console.log("picElement:", picElement);
 
-    // จำลองการบันทึกข้อมูลลงฐานข้อมูล (log ข้อมูลที่จะส่งไป backend)
-    console.log("ข้อมูลที่จะบันทึกลงฐานข้อมูล:", {
-      // ข้อมูลอื่นๆ ของสายการบิน
-      imagePath: airlineImage.value,
-    });
+    if (picElement) {
+      setTimeout(() => {
+        picElement.style.backgroundImage = `url(${imageDataUrl})`;
+        picElement.style.backgroundSize = "cover";
+        picElement.style.backgroundPosition = "center";
+        console.log("ตั้งค่า background เรียบร้อย");
+      }, 10);
+    } else {
+      console.error("ไม่พบองค์ประกอบที่มี class 'pic'");
+    }
   };
 
   reader.readAsDataURL(file);
-  event.target.value = ""; // รีเซ็ตค่า input เพื่อให้สามารถเลือกไฟล์เดิมได้อีก
+  event.target.value = "";
 };
 
 onBeforeUnmount(() => {
