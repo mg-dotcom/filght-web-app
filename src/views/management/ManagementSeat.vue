@@ -4,7 +4,7 @@ import ManagementOverview from "@/components/ManagementOverview.vue";
 import Dropdown from "@/components/Dropdown.vue";
 import { useRouter } from "vue-router";
 import {
-  seatData,
+  seatDataInfo,
   economySeatsData,
   businessSeatsData,
   firstClassSeatsData,
@@ -12,7 +12,6 @@ import {
   getSeatStatus,
   getSeatInfo,
   isSeatAvailable,
-  formatSelectedClassTypeId,
   formatSeatId,
 } from "@/data/management-seat.js";
 
@@ -71,7 +70,7 @@ const selectSeat = (rowNum, col) => {
   isEditPassengerSeat.value = false;
 
   const seatId = formatSeatId(rowNum, col);
-  const classType = formatSelectedClassTypeId(selectedClassTypeId.value);
+  const classType = selectedClassTypeId.value;
 
   const seat = seatsByClass.value.find(
     (seat) => seat.id === seatId && seat.class === classType
@@ -337,7 +336,7 @@ onUnmounted(() => {
           <div class="seat-view">
             <div class="seat-class-types">
               <div
-                v-for="classType in seatData.classTypes"
+                v-for="classType in seatDataInfo.classTypes"
                 :key="classType.id"
                 :class="{ active: selectedClassTypeId === classType.id }"
                 @click="selectClassType(classType.id)"
@@ -350,7 +349,7 @@ onUnmounted(() => {
               <div class="seat-columns">
                 <div
                   class="column-header"
-                  v-for="col in seatData.columns"
+                  v-for="col in seatDataInfo.columns"
                   :key="'header-' + col"
                   :class="{ spacer: col === '' }"
                 >
@@ -363,7 +362,7 @@ onUnmounted(() => {
 
                 <div class="seat-grid-row">
                   <div
-                    v-for="col in seatData.columns"
+                    v-for="col in seatDataInfo.columns"
                     :key="`${rowNum}-${col || 'spacer'}`"
                     class="seat-container"
                   >

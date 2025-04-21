@@ -5,7 +5,7 @@ export const aircraftData = [
   {
     aircraftID: "BOE001",
     model: "Boeing 777-300ER",
-    capacity: 348,
+    capacity: 189,
     airlineID: "SG1234",
     registrationNumber: "9V-SWA",
     aircraftStatus: AVAILABLE,
@@ -13,7 +13,7 @@ export const aircraftData = [
   {
     aircraftID: "ABA001",
     model: "Airbus A320neo",
-    capacity: 186,
+    capacity: 189,
     airlineID: "SG1234",
     registrationNumber: "9V-TRB",
     aircraftStatus: NOT_AVAILABLE,
@@ -29,7 +29,7 @@ export const aircraftData = [
   {
     aircraftID: "BOE003",
     model: "Boeing 777-200",
-    capacity: 312,
+    capacity: 189,
     airlineID: "TH5678",
     registrationNumber: "HS-TJA",
     aircraftStatus: NOT_AVAILABLE,
@@ -37,7 +37,7 @@ export const aircraftData = [
   {
     aircraftID: "ABA002",
     model: "Airbus A320",
-    capacity: 180,
+    capacity: 189,
     airlineID: "TH5678",
     registrationNumber: "HS-BBJ",
     aircraftStatus: AVAILABLE,
@@ -45,7 +45,7 @@ export const aircraftData = [
   {
     aircraftID: "BOE004",
     model: "Boeing 737-400",
-    capacity: 168,
+    capacity: 189,
     airlineID: "JL9012",
     registrationNumber: "JA8992",
     aircraftStatus: NOT_AVAILABLE,
