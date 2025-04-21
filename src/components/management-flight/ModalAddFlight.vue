@@ -1,20 +1,36 @@
 <script setup>
-import { ref, defineProps, defineEmits, onMounted, onBeforeUnmount } from "vue";
+import { ref, defineProps, defineEmits, onMounted, computed } from "vue";
+import { formatDate } from "@/utils/flightUtils";
 import ModalConfirm from "../ModalConfirm.vue";
+import { useAircraftStore } from "@/stores/aircraftStore";
+import { useFlightStore } from "@/stores/flightStore";
+import { useRoute } from "vue-router";
 import Dropdown from "../Dropdown.vue";
 
 const emit = defineEmits(["addFlight", "close"]);
+const route = useRoute();
+const aircraftStore = useAircraftStore();
+const flightStore = useFlightStore();
 const isShowConfirmModal = ref(false);
+const airlineID = route.params.airlineID;
 
-const showConfirmAddFlight = () => {
-  isShowConfirmModal.value = true;
-};
+onMounted(() => {
+  aircraftStore.loadAircrafts();
+});
 
 defineProps({
   showModal: {
     type: Boolean,
     default: false,
   },
+});
+
+const aircrafts = computed(() => {
+  return aircraftStore.getAircraftsByAirlineID(airlineID);
+});
+
+const flights = computed(() => {
+  return flightStore.getAllFlights;
 });
 
 const mode = ref("");
@@ -28,17 +44,31 @@ const statusOptions = [
 
 // form data
 const form = ref({
-  from: "",
-  departureDate: "",
-  departureTime: "",
-  to: "",
-  arrivalDate: "",
-  arrivalTime: "",
-  aircraft: "",
-  stop: 0,
-  duration: 0,
-  flightStatus: "",
+  flightID: null,
+  airlineID: "",
+  isSeatAvailable: true,
+  departure: {
+    airport: "",
+    time: "",
+    date: "",
+  },
+  destination: {
+    airport: "",
+    time: "",
+    date: "",
+  },
+  date: "",
+  duration: {
+    time: "",
+    stop: "",
+  },
+  aircraftID: "",
+  flightStatus: "Pending",
 });
+
+const showConfirmAddFlight = () => {
+  isShowConfirmModal.value = true;
+};
 
 const confirmAddFlight = () => {
   mode.value = "success";
@@ -51,15 +81,42 @@ const discardAddFlight = () => {
 };
 
 const addFlight = () => {
-  const flightData = { ...form.value };
-  emit("addFlight", flightData);
+  // จริงๆ ควรใช้ flights.value หรือ reactive ขึ้นอยู่กับว่าคุณใช้ ref หรือ reactive
+  const existingIDs = new Set(flights.value.map((f) => f.flightID));
+
+  // สร้าง flightID ใหม่ที่ไม่ซ้ำ
+  let newID = 1;
+  while (existingIDs.has(newID)) {
+    newID++;
+  }
+
+  // ใช้ JSON.parse(JSON.stringify()) สำหรับ deep clone
+  const flightData = JSON.parse(JSON.stringify(form.value)); // deep clone ด้วย JSON
+  const data = {
+    ...flightData,
+    flightID: newID,
+    airlineID: airlineID,
+    date: formatDate(new Date()),
+  };
+
+  emit("addFlight", data);
   closeModal();
 };
 
-const closeModal = () => {
+const clearForm = () => {
   for (const key in form.value) {
-    form.value[key] = typeof form.value[key] === "string" ? "" : null;
+    if (typeof form.value[key] === "object" && form.value[key] !== null) {
+      for (const subKey in form.value[key]) {
+        form.value[key][subKey] = "";
+      }
+    } else {
+      form.value[key] = typeof form.value[key] === "boolean" ? true : "";
+    }
   }
+};
+
+const closeModal = () => {
+  clearForm();
   isShowConfirmModal.value = false;
   emit("close");
 };
@@ -143,9 +200,13 @@ const closeModal = () => {
               </div>
 
               <div class="form-row inputs">
-                <input type="text" placeholder="- - -" v-model="form.from" />
-                <input type="date" v-model="form.departureDate" />
-                <input type="time" v-model="form.departureTime" />
+                <input
+                  type="text"
+                  placeholder="- - -"
+                  v-model="form.departure.airport"
+                />
+                <input type="date" v-model="form.departure.date" />
+                <input type="time" v-model="form.departure.time" />
               </div>
 
               <div class="form-row">
@@ -155,9 +216,13 @@ const closeModal = () => {
               </div>
 
               <div class="form-row inputs">
-                <input type="text" placeholder="- - -" v-model="form.to" />
-                <input type="date" v-model="form.arrivalDate" />
-                <input type="time" v-model="form.arrivalTime" />
+                <input
+                  type="text"
+                  placeholder="- - -"
+                  v-model="form.destination.airport"
+                />
+                <input type="date" v-model="form.destination.date" />
+                <input type="time" v-model="form.destination.time" />
               </div>
 
               <div
@@ -181,16 +246,27 @@ const closeModal = () => {
                   align-items: center;
                 "
               >
-                <input
-                  type="text"
-                  placeholder="Boeing 123-456"
-                  v-model="form.aircraft"
-                />
-                <input type="number" placeholder="- -" v-model="form.stop" />
+                <select v-model="form.aircraftID">
+                  <option value="" disabled selected hidden>
+                    Select Aircraft
+                  </option>
+                  <option
+                    v-for="aircraft in aircrafts"
+                    :key="aircraft.aircraftID"
+                    :value="aircraft.aircraftID"
+                  >
+                    {{ aircraft.model }}
+                  </option>
+                </select>
                 <input
                   type="number"
                   placeholder="- -"
-                  v-model="form.duration"
+                  v-model="form.duration.stop"
+                />
+                <input
+                  type="number"
+                  placeholder="- -"
+                  v-model="form.duration.time"
                 />
               </div>
             </div>
@@ -458,6 +534,25 @@ input {
   color: #5a6777;
   background-color: #f0f5fa;
   width: 100%;
+}
+
+select {
+  border: 1px solid var(--c-navy-light);
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 14px;
+  color: #5a6777;
+  background-color: #f0f5fa;
+  width: 100%;
+}
+
+select option {
+  color: #5a6777;
+  background-color: #f0f5fa;
+}
+
+select option:disabled {
+  color: #a0b2c4;
 }
 
 input::placeholder {

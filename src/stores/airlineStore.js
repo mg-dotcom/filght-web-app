@@ -1,9 +1,10 @@
 import { defineStore } from "pinia";
 import { airlineData } from "@/data/management-airline.js";
+import { ref } from "vue";
 
 export const useAirlineStore = defineStore("airline", {
   state: () => ({
-    airlines: [],
+    airlines: ref([]),
     selectedAirline: null,
   }),
 

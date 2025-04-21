@@ -57,10 +57,16 @@ watch(
 watch(
   () => props.aircraftID,
   (newID) => {
+    if (!newID) return;
+
     const aircraft = aircraftStore.getAircraftByID(newID);
-    const airlineNameShort = airlineStore.getAirlineByID(
-      aircraft?.airlineID
-    )?.name_short;
+    let airlineNameShort = "";
+
+    if (aircraft?.airlineID) {
+      const airline = airlineStore.getAirlineByID(aircraft.airlineID);
+      airlineNameShort = airline?.name_short || "";
+    }
+
     if (aircraft) {
       form.value = {
         ...form.value,

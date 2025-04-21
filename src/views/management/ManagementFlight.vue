@@ -8,6 +8,7 @@ import { useAircraftStore } from "@/stores/aircraftStore";
 import { useRouter, useRoute } from "vue-router";
 import Dropdown from "@/components/Dropdown.vue";
 import ModalAircraft from "@/components/management-flight/ModalAircraft.vue";
+import { formatAircraftModel } from "@/utils/flightUtils";
 
 const tableHeaders = [
   { label: "SeatAvailable" },
@@ -58,7 +59,8 @@ const updatePaginatedFlights = (flights) => {
 };
 
 const addFlight = (newFlight) => {
-  console.log("New Flight Data:", newFlight);
+  flightStore.addFlight(newFlight);
+  showModal.value = false;
 };
 
 const showModalAddFlight = () => {
@@ -69,13 +71,6 @@ const showModalAddFlight = () => {
 const showModalInfoAircraft = (aircraftID) => {
   selectedAircraftID.value = aircraftID;
   showAircraft.value = true;
-};
-
-// Aircraft Model
-const formatAircraftModel = (aircraftID) => {
-  const model = aircraftStore.getAircraftByID(aircraftID)?.model || "";
-  const parts = model.split(" ");
-  return `${parts[0] ?? ""}<br/>${parts[1] ?? ""}`;
 };
 </script>
 
@@ -183,9 +178,7 @@ const formatAircraftModel = (aircraftID) => {
 
           <div class="flight-cell route-cell">
             <div class="flight-line">
-              <p>
-                {{ flight.duration.time }}
-              </p>
+              <p>{{ flight.duration.time }} hrs</p>
               <div class="line">
                 <img
                   src="/dashboard-pic/icons/plane-icon.png"
@@ -196,9 +189,7 @@ const formatAircraftModel = (aircraftID) => {
                   alt=""
                 />
               </div>
-              <p>
-                {{ flight.duration.stop }}
-              </p>
+              <p>{{ flight.duration.stop }} stop</p>
             </div>
           </div>
 
@@ -218,10 +209,7 @@ const formatAircraftModel = (aircraftID) => {
             </div>
           </div>
 
-          <div class="flight-cell date-cell">
-            {{ flight.date.split(" ")[0] }}<br />
-            {{ flight.date.split(" ")[1] }} {{ flight.date.split(" ")[2] }}
-          </div>
+          <div class="flight-cell date-cell">{{ flight.date }}</div>
 
           <div
             class="flight-cell aircraft-cell"

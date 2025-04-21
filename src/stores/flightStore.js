@@ -1,9 +1,10 @@
 import { defineStore } from "pinia";
 import { flightData } from "@/data/management-flight";
+import { ref } from "vue";
 
 export const useFlightStore = defineStore("flight", {
   state: () => ({
-    flights: [],
+    flights: ref([]),
     selectedFlight: null,
   }),
 
@@ -20,6 +21,9 @@ export const useFlightStore = defineStore("flight", {
   actions: {
     loadFlights() {
       this.flights = flightData;
+    },
+    addFlight(flight) {
+      this.flights.push(flight);
     },
   },
 });

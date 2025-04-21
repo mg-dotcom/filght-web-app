@@ -15,6 +15,11 @@ export const useAircraftStore = defineStore("aircraft", {
         (aircraft) => aircraft.aircraftID === aircraftID
       );
     },
+    getAircraftsByAirlineID: (state) => (airlineID) => {
+      return state.aircraft.filter(
+        (aircraft) => aircraft.airlineID === airlineID
+      );
+    },
   },
 
   actions: {

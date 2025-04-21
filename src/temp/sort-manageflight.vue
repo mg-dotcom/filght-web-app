@@ -27,7 +27,11 @@ const tableHeaders = [
 
 const statusOptions = [
   { label: "Open", value: "open", class: "open" },
-  { label: "Temporarily closed", value: "temporarily-closed", class: "temporarily-closed" },
+  {
+    label: "Temporarily closed",
+    value: "temporarily-closed",
+    class: "temporarily-closed",
+  },
 ];
 
 // const flightStore = useFlightStore();
@@ -268,8 +272,7 @@ const showModalAircraft = () => {
           </div>
 
           <div class="flight-cell date-cell">
-            {{ flight.date.split(" ")[0] }}<br />
-            {{ flight.date.split(" ")[1] }} {{ flight.date.split(" ")[2] }}
+            {{ flight.date }}
           </div>
 
           <div

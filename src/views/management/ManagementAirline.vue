@@ -13,9 +13,8 @@ onMounted(() => {
   airlineStore.loadAirlines();
 });
 
-const addFlight = (airline) => {
-  console.log(airline);
-  airlineStore.addAirline(airline);
+const addAirline = (newAirline) => {
+  airlineStore.addAirline(newAirline);
   isShowModalAddAirline.value = false;
 };
 
@@ -143,7 +142,7 @@ const showModalAddAirline = () => {
   <ModalAddAirline
     :isShowModalAddAirline="isShowModalAddAirline"
     @close="isShowModalAddAirline = false"
-    @addAirline="addFlight"
+    @addAirline="addAirline"
   ></ModalAddAirline>
 </template>
 

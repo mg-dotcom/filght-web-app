@@ -23,6 +23,15 @@ onMounted(() => {
   }
 });
 
+// เพิ่ม watcher สำหรับข้อมูลเที่ยวบิน
+watch(
+  () => flightStore.flights,
+  () => {
+    emit("update:paginatedData", paginatedFlights.value);
+  },
+  { deep: true }
+);
+
 //  คำนวณจำนวนหน้าทั้งหมด = จำนวนเที่ยวบิน ÷ จำนวนรายการต่อหน้า
 //  flightData.value.length = 12, itemsPerPage = 6, totalPages = 2
 const totalPages = computed(() =>
