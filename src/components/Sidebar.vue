@@ -9,6 +9,7 @@ const navItems = [
   // ใช้เป็นเพจหลักของ /management เป้น /management/seat ชั่วคราว
   { icon: "users", label: "Management", path: "/management/menu" },
   { icon: "file-text", label: "Reports", path: "/reports" },
+  { icon: "active-users", label: "Active Users", path: "/active-users" },
 ];
 
 const iconMap = {
@@ -62,24 +63,27 @@ const activeUsers = [
           }"
           @click="router.push(item.path)"
         >
-          <div class="icon">
-            <img :src="iconMap[item.icon]" :alt="item.label + ' icon'" />
+          <div v-if="item.label !== 'Active Users'" class="nav-item-content">
+            <div class="icon">
+              <img :src="iconMap[item.icon]" :alt="item.label + ' icon'" />
+            </div>
+            <span class="nav-label">{{ item.label }}</span>
           </div>
-          <span class="nav-label">{{ item.label }}</span>
+          <div
+            v-else="item.label == 'Active Users'"
+            class="active-users-section"
+          >
+            <div class="avatars-container">
+              <div v-for="user in activeUsers" :key="user.id" class="avatar">
+                <img :src="user.avatar" alt="User avatar" />
+              </div>
+              <div class="more-users">+50</div>
+            </div>
+            <div class="active-label">Active Users</div>
+          </div>
         </li>
       </ul>
     </nav>
-
-    <!-- Active Users -->
-    <div class="active-users-section">
-      <div class="avatars-container">
-        <div v-for="user in activeUsers" :key="user.id" class="avatar">
-          <img :src="user.avatar" alt="User avatar" />
-        </div>
-        <div class="more-users">+50</div>
-      </div>
-      <div class="active-label">Active Users</div>
-    </div>
 
     <!-- World Map -->
     <div class="world-map">
@@ -91,7 +95,7 @@ const activeUsers = [
 <style scoped>
 /* ส่วนของ Sidebar */
 .sidebar {
-  width: 220px;
+  width: 250px;
   height: 100vh;
   background-color: var(--c-navy-light);
   color: white;
@@ -177,10 +181,16 @@ const activeUsers = [
   flex-direction: column;
   padding: 0 15px;
 }
+
 .navigation ul {
   list-style: none;
   padding: 0;
   margin: 0;
+}
+
+.navigation li:nth-last-child(1) {
+  display: flex;
+  justify-content: center;
 }
 
 .nav-item {
@@ -191,6 +201,12 @@ const activeUsers = [
   cursor: pointer;
   position: relative;
   margin-right: -16px;
+  gap: 12px;
+}
+
+.nav-item-content {
+  display: flex;
+  align-items: center;
   gap: 12px;
 }
 
@@ -238,7 +254,6 @@ const activeUsers = [
 
 /* ส่วนของ Active Users */
 .active-users-section {
-  padding: 15px;
   text-align: center;
 }
 

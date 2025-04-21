@@ -5,6 +5,7 @@ import ManagementSeat from "@/views/management/ManagementSeat.vue";
 import ManagementAirline from "@/views/management/ManagementAirline.vue";
 import ManagementFlight from "@/views/management/ManagementFlight.vue";
 import ManagementMenu from "@/views/management/ManagementMenu.vue";
+import ManagementPassenger from "@/views/management/ManagementPassenger.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -29,11 +30,6 @@ const router = createRouter({
           component: ManagementMenu,
         },
         {
-          path: "seat",
-          name: "management-seat",
-          component: ManagementSeat,
-        },
-        {
           path: "airline",
           name: "management-airline",
           component: ManagementAirline,
@@ -42,6 +38,16 @@ const router = createRouter({
           path: ":airlineID/flight",
           name: "management-flight",
           component: ManagementFlight,
+        },
+        {
+          path: ":airlineID/flight/:flightID/seat",
+          name: "management-seat",
+          component: ManagementSeat,
+        },
+        {
+          path: ":airlineID/flight/:flightID/passenger",
+          name: "management-passenger",
+          component: ManagementPassenger,
         },
       ],
     },

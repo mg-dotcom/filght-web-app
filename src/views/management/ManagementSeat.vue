@@ -1,21 +1,31 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import ManagementOverview from "@/components/ManagementOverview.vue";
+import { useSeatStore } from "@/stores/seatStore";
 import Dropdown from "@/components/Dropdown.vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
+import { seatDataInfo } from "@/data/management-seat.js";
 import {
-  seatDataInfo,
-  economySeatsData,
-  businessSeatsData,
-  firstClassSeatsData,
   getUniqueRows,
   getSeatStatus,
   getSeatInfo,
   isSeatAvailable,
   formatSeatId,
-} from "@/data/management-seat.js";
+} from "@/utils/seatUtils.js";
+
+onMounted(() => {
+  seatStore.loadSeats();
+  document.addEventListener("click", handleClickOutside);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("click", handleClickOutside);
+});
 
 const router = useRouter();
+const route = useRoute();
+
+const flightID = Number(route.params.flightID);
 
 const selectedClassTypeId = ref("economy");
 const selectedPassengerSeat = ref(null);
@@ -23,6 +33,19 @@ const isStatusDropdownOpen = ref(false);
 const isEditPassengerSeat = ref(false);
 const editAreaRef = ref(null);
 const statusAllSeats = ref("");
+const seatStore = useSeatStore();
+
+const economySeatData = computed(() => {
+  return seatStore.getEconomySeatsByFlightId(flightID);
+});
+
+const businessSeatData = computed(() => {
+  return seatStore.getBusinessSeatsByFlightId(flightID);
+});
+
+const firstClassSeatData = computed(() => {
+  return seatStore.getFirstClassSeatsByFlightId(flightID);
+});
 
 const statusOptionsSeat = [
   { value: true, label: "Checked-In", class: "checked-in" },
@@ -37,11 +60,11 @@ const statusOptionsAllSeats = [
 const seatsByClass = computed(() => {
   switch (selectedClassTypeId.value) {
     case "economy":
-      return economySeatsData;
+      return economySeatData.value;
     case "business":
-      return businessSeatsData;
+      return businessSeatData.value;
     case "first-class":
-      return firstClassSeatsData;
+      return firstClassSeatData.value;
     default:
       return [];
   }
@@ -73,19 +96,19 @@ const selectSeat = (rowNum, col) => {
   const classType = selectedClassTypeId.value;
 
   const seat = seatsByClass.value.find(
-    (seat) => seat.id === seatId && seat.class === classType
+    (seat) => seat.seatID === seatId && seat.seatClass === classType
   );
 
   if (!seat) return;
 
-  if (seat.status === "available") return;
+  if (seat.availability === "available") return;
 
-  if (selectedPassengerSeat.value?.id === seat.id) {
+  if (selectedPassengerSeat.value?.seatID === seat.seatID) {
     selectedPassengerSeat.value = null;
   } else {
     selectedPassengerSeat.value = seat;
     console.log(
-      `Selected Seat: ${seat.id}, Class: ${classType}, Status: ${seat.status}, Checked In: ${seat.isCheckedIn}`
+      `Selected Seat: ${seat.seatID}, Class: ${classType}, Status: ${seat.availability}, Checked In: ${seat.isCheckedIn}`
     );
   }
 };
@@ -97,14 +120,6 @@ const handleClickOutside = (event) => {
     }
   }
 };
-
-onMounted(() => {
-  document.addEventListener("click", handleClickOutside);
-});
-
-onUnmounted(() => {
-  document.removeEventListener("click", handleClickOutside);
-});
 </script>
 
 <template>
@@ -252,7 +267,7 @@ onUnmounted(() => {
             <div class="select-seat-header">
               <template v-if="selectedPassengerSeat">
                 <div>
-                  Seat <strong>{{ selectedPassengerSeat.id }}</strong>
+                  Seat <strong>{{ selectedPassengerSeat.seatID }}</strong>
                 </div>
                 <button
                   class="edit-btn"
@@ -391,7 +406,7 @@ onUnmounted(() => {
                         <img
                           v-else-if="
                             selectedPassengerSeat &&
-                            selectedPassengerSeat.id ===
+                            selectedPassengerSeat.seatID ===
                               formatSeatId(rowNum, col)
                           "
                           src="/management-pic/management-seat/passenger-seat-type.png"

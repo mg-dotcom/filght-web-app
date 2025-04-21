@@ -1,7 +1,6 @@
 <script setup>
 import { useRouter } from "vue-router";
 import { ref } from "vue";
-const show = ref(false);
 const router = useRouter();
 </script>
 

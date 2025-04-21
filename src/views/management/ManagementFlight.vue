@@ -5,7 +5,7 @@ import ModalAddFlight from "@/components/management-flight/ModalAddFlight.vue";
 import { ref, computed, onMounted } from "vue";
 import { useFlightStore } from "@/stores/flightStore";
 import { useAircraftStore } from "@/stores/aircraftStore";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import Dropdown from "@/components/Dropdown.vue";
 import ModalAircraft from "@/components/management-flight/ModalAircraft.vue";
 
@@ -31,6 +31,7 @@ const statusOptions = [
   { label: "Delayed", value: "delayed", class: "delayed" },
 ];
 
+const route = useRoute();
 const flightStore = useFlightStore();
 const aircraftStore = useAircraftStore();
 const router = useRouter();
@@ -39,6 +40,7 @@ const showAircraft = ref(false);
 const status = ref("");
 const formMode = ref("");
 const selectedAircraftID = ref("");
+const airlineID = route.params.airlineID;
 
 onMounted(() => {
   flightStore.loadFlights();
@@ -142,6 +144,10 @@ const formatAircraftModel = (aircraftID) => {
             @click="
               router.push({
                 name: 'management-seat',
+                params: {
+                  flightID: flight.flightID,
+                  airlineID: airlineID,
+                },
               })
             "
           >
@@ -239,7 +245,15 @@ const formatAircraftModel = (aircraftID) => {
           </div>
 
           <div class="flight-cell action-cell">
-            <button class="edit-button">
+            <button
+              class="edit-button"
+              @click="
+                router.push({
+                  name: 'management-passenger',
+                  params: { flightID: flight.flightID },
+                })
+              "
+            >
               <svg
                 width="20"
                 height="20"
