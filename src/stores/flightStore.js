@@ -11,8 +11,8 @@ export const useFlightStore = defineStore("flight", {
   getters: {
     getAllFlights: (state) => state.flights,
     getFlightsByAirlineId: (state) => (airlineID) => {
-      const trimmedID = (airlineID || "").trim().toLowerCase();
-      const query = state.searchQuery?.toLowerCase() || "";
+      const trimmedID = airlineID.trim().toLowerCase();
+      const query = state.searchQuery;
       const selectedStatus = state.selectedFlightStatus;
 
       return state.flights.filter((flight) => {
@@ -60,7 +60,8 @@ export const useFlightStore = defineStore("flight", {
       }
     },
     setSearchQuery(query) {
-      this.searchQuery = query;
+      const trimmedQuery = query.trim().toLowerCase();
+      this.searchQuery = trimmedQuery;
     },
     setSelectedStatus(status) {
       this.selectedFlightStatus = status;

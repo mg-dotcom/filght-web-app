@@ -32,7 +32,8 @@ export const useAirlineStore = defineStore("airline", {
       this.airlines.push(airline);
     },
     setSearchQuery(query) {
-      this.searchQuery = query.trim();
+      const trimmedQuery = query.trim().toLowerCase();
+      this.searchQuery = trimmedQuery;
     },
   },
 });

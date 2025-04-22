@@ -5,6 +5,7 @@ export const useSeatStore = defineStore("seat", {
   state: () => ({
     seats: [],
     selectedSeat: null,
+    searchQuery: "",
   }),
 
   getters: {
@@ -30,6 +31,29 @@ export const useSeatStore = defineStore("seat", {
         (seat) => seat.flightID === flightID && seat.seatClass === "first-class"
       );
     },
+    getSelectedSeatBySearchQueryAndClass: (state) => (classType) => {
+      const query = state.searchQuery.trim().toLowerCase();
+      if (!query) return [];
+
+      const filteredSeats = state.seats.filter(
+        (seat) =>
+          seat.availability === "unavailable" && seat.seatClass === classType
+      );
+
+      const exactMatches = filteredSeats.filter(
+        (seat) => seat.seatID.toLowerCase() === query
+      );
+
+      // ถ้าเจอ → return เลย
+      if (exactMatches.length > 0) {
+        return exactMatches;
+      }
+
+      // ถ้าไม่เจอ → หาตามที่ขึ้นต้นด้วย query
+      return filteredSeats.filter((seat) =>
+        seat.seatID.toLowerCase().startsWith(query)
+      );
+    },
   },
 
   actions: {
@@ -53,6 +77,10 @@ export const useSeatStore = defineStore("seat", {
         };
         this.seats.splice(index, 1, updated);
       }
+    },
+    setSearchQuery(query) {
+      const trimmedQuery = query.trim().toLowerCase();
+      this.searchQuery = trimmedQuery;
     },
   },
 });

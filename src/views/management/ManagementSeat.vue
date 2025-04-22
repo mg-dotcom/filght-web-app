@@ -19,6 +19,7 @@ onMounted(() => {
   seatStore.loadSeats();
   flightStore.loadFlights();
   document.addEventListener("click", handleClickOutside);
+  seatStore.setSearchQuery("");
 });
 
 onUnmounted(() => {
@@ -193,7 +194,29 @@ const handleClickOutside = (event) => {
   }
 };
 
-const handleSearch = (event) => {};
+const handleSearch = (event) => {
+  const query = event.target.value.trim().toLowerCase();
+  seatStore.setSearchQuery(query);
+
+  if (query) {
+    const matchingSeats = seatStore.getSelectedSeatBySearchQueryAndClass(
+      selectedClassTypeId.value
+    );
+
+    if (matchingSeats.length > 0) {
+      selectedPassengerSeat.value = matchingSeats[0];
+
+      isEditPassengerSeat.value = false;
+    }
+  } else {
+    clearSearch();
+  }
+};
+
+const clearSearch = () => {
+  seatStore.setSearchQuery("");
+  clearSelectedSeat();
+};
 </script>
 
 <template>
@@ -356,7 +379,7 @@ const handleSearch = (event) => {};
                   :class="{ active: isEditPassengerSeat }"
                   @click="editPassengerSeat"
                 >
-                  Edit
+                  {{ isEditPassengerSeat ? "Save" : "Edit" }}
                 </button>
               </template>
               <template v-else> Select Your Seat </template>
