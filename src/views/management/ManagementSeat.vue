@@ -39,7 +39,7 @@ const flightStore = useFlightStore();
 
 const selectedFlightForm = ref({
   flightID: flightID,
-  isSeatAvailable: "not-available", 
+  isSeatAvailable: "not-available",
   departure: {
     airport: "",
     time: "",
@@ -192,6 +192,8 @@ const handleClickOutside = (event) => {
     }
   }
 };
+
+const handleSearch = (event) => {};
 </script>
 
 <template>
@@ -309,7 +311,12 @@ const handleClickOutside = (event) => {
               />
             </svg>
           </div>
-          <input type="text" placeholder="Search Seat" class="search-input" />
+          <input
+            @input="handleSearch"
+            type="text"
+            placeholder="Search Seat"
+            class="search-input"
+          />
         </div>
         <div class="status-selector">
           <Dropdown
