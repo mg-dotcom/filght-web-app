@@ -215,6 +215,11 @@ const selectedOption = computed(() => {
   color: var(--c-orange);
 }
 
+.status-option.all span {
+  background-color: var(--c-light-gray, #f0f0f0);
+  color: var(--c-dark-gray, #333333);
+}
+
 .status-option:last-child {
   border-bottom: none;
 }
@@ -268,5 +273,10 @@ const selectedOption = computed(() => {
 :deep(.badge.not-checked-in) {
   background-color: var(--c-light-orange);
   color: var(--c-orange);
+}
+
+:deep(.badge.all) {
+  background-color: var(--c-light-gray, #f0f0f0);
+  color: var(--c-dark-gray, #333333);
 }
 </style>

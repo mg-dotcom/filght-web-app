@@ -26,6 +26,8 @@ const tableHeaders = [
 ];
 
 const statusOptions = [
+  { label: "All", value: "all", class: "all" },
+
   { label: "Canceled", value: "canceled", class: "canceled" },
   {
     label: "Completed",
@@ -50,6 +52,9 @@ const airlineID = route.params.airlineID;
 onMounted(() => {
   flightStore.loadFlights();
   aircraftStore.loadAircrafts();
+  // reset ค่า query เเละ status ของ flightStore
+  flightStore.setSelectedStatus(null); 
+  flightStore.setSearchQuery("");
 });
 
 // ส่วนของ pageination เเละ sort data

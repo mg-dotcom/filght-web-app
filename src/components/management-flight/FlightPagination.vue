@@ -9,32 +9,27 @@ const airlineID = route.params.airlineID;
 const flightStore = useFlightStore();
 const itemsPerPage = 6;
 const currentPage = ref(1);
+
 // ได้ข้อมูล flight ของ airlineID ที่เลือกจาก route params
 const flightData = computed(() => flightStore.getFlightsByAirlineId(airlineID));
 
 onMounted(() => {
-  if (flightData.value.length === 0) {
-    flightStore.loadFlights();
-    setTimeout(() => {
-      emit("update:paginatedData", paginatedFlights.value);
-    }, 0);
-  } else {
-    emit("update:paginatedData", paginatedFlights.value);
-  }
+  flightStore.loadFlights();
+  emit("update:paginatedData", paginatedFlights.value);
 });
 
 // เพิ่ม watcher สำหรับข้อมูลเที่ยวบิน
 watch(
-  () => [flightStore.searchQuery, flightStore.selectedFlightStatus],
+  [
+    flightData,
+    () => flightStore.searchQuery,
+    () => flightStore.selectedFlightStatus,
+  ],
   () => {
-    console.log(flightStore.selectedFlightStatus);
-    const newFlights = flightStore.selectedFlightStatus
-      ? flightStore.getFilteredFlightsByAirlineId(airlineID)
-      : flightStore.getFlightsByAirlineId(airlineID);
-
-    emit("update:paginatedData", newFlights);
+    currentPage.value = 1;
+    emit("update:paginatedData", paginatedFlights.value);
   },
-  { immediate: true }
+  { deep: true }
 );
 
 //  คำนวณจำนวนหน้าทั้งหมด = จำนวนเที่ยวบิน ÷ จำนวนรายการต่อหน้า
