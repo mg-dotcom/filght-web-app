@@ -3,7 +3,7 @@ import ManagementOverview from "@/components/ManagementOverview.vue";
 import FlightPagination from "@/components/management-flight/FlightPagination.vue";
 import ModalAddFlight from "@/components/management-flight/ModalAddFlight.vue";
 import { formatDate, mapFlightStatus } from "@/utils/flightUtils";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useFlightStore } from "@/stores/flightStore";
 import { useAircraftStore } from "@/stores/aircraftStore";
 import { useRouter, useRoute } from "vue-router";
@@ -76,6 +76,14 @@ const showModalInfoAircraft = (aircraftID) => {
   selectedAircraftID.value = aircraftID;
   showAircraft.value = true;
 };
+
+const handleSearch = (event) => {
+  flightStore.setSearchQuery(event.target.value);
+};
+
+watch(status, (newStatus) => {
+  flightStore.setSelectedStatus(newStatus);
+});
 </script>
 
 <template>
@@ -95,7 +103,12 @@ const showModalInfoAircraft = (aircraftID) => {
           <div class="search-icon">
             <img src="/search-input.svg" alt="" />
           </div>
-          <input type="text" placeholder="Search Flight" class="search-input" />
+          <input
+            type="text"
+            placeholder="Search Flight"
+            class="search-input"
+            @input="handleSearch"
+          />
         </div>
         <Dropdown v-model="status" :statusOptions="statusOptions">
           <template #trigger="{ selected }">

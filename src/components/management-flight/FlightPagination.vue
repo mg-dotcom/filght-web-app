@@ -25,11 +25,16 @@ onMounted(() => {
 
 // เพิ่ม watcher สำหรับข้อมูลเที่ยวบิน
 watch(
-  () => flightStore.flights,
+  () => [flightStore.searchQuery, flightStore.selectedFlightStatus],
   () => {
-    emit("update:paginatedData", paginatedFlights.value);
+    console.log(flightStore.selectedFlightStatus);
+    const newFlights = flightStore.selectedFlightStatus
+      ? flightStore.getFilteredFlightsByAirlineId(airlineID)
+      : flightStore.getFlightsByAirlineId(airlineID);
+
+    emit("update:paginatedData", newFlights);
   },
-  { deep: true }
+  { immediate: true }
 );
 
 //  คำนวณจำนวนหน้าทั้งหมด = จำนวนเที่ยวบิน ÷ จำนวนรายการต่อหน้า
