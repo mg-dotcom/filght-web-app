@@ -1,10 +1,9 @@
 import { defineStore } from "pinia";
 import { flightData } from "@/data/management-flight";
-import { ref } from "vue";
 
 export const useFlightStore = defineStore("flight", {
   state: () => ({
-    flights: ref([]),
+    flights: [],
     selectedFlight: null,
   }),
 
@@ -16,6 +15,12 @@ export const useFlightStore = defineStore("flight", {
     getFlightByID: (state) => (flightID) => {
       return state.flights.find((flight) => flight.flightID === flightID);
     },
+    getFlightStatusByID: (state) => (flightID) => {
+      const flight = state.flights.find(
+        (flight) => flight.flightID === flightID
+      );
+      return flight ? flight.flightStatus : null;
+    },
   },
 
   actions: {
@@ -24,6 +29,18 @@ export const useFlightStore = defineStore("flight", {
     },
     addFlight(flight) {
       this.flights.push(flight);
+    },
+    updateSeatFlightAvailability(flightID, isSeatAvailable) {
+      const index = this.flights.findIndex(
+        (flight) => flight.flightID === flightID
+      );
+      if (index !== -1) {
+        const updated = {
+          ...this.flights[index],
+          isSeatAvailable: isSeatAvailable,
+        };
+        this.flights.splice(index, 1, updated);
+      }
     },
   },
 });

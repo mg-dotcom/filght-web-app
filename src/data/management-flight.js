@@ -1,3 +1,8 @@
+const PENDING = "pending";
+const COMPLETED = "completed";
+const DELAYED = "delayed";
+const CANCELED = "canceled";
+
 export const flightData = [
   {
     flightID: 1,
@@ -17,9 +22,8 @@ export const flightData = [
       time: "11",
       stop: "1",
     },
-    date: "2024-03-09",
     aircraftID: "BOE001",
-    flightStatus: "Pending",
+    flightStatus: PENDING,
   },
   {
     flightID: 2,
@@ -35,13 +39,12 @@ export const flightData = [
       airport: "SG",
       date: "2024-03-09",
     },
-    date: "2024-03-09",
     duration: {
       time: "11",
       stop: "1",
     },
     aircraftID: "ABA001",
-    flightStatus: "Completed",
+    flightStatus: COMPLETED,
   },
   {
     flightID: 3,
@@ -57,13 +60,12 @@ export const flightData = [
       airport: "SG",
       date: "2024-03-09",
     },
-    date: "2024-03-09",
     duration: {
       time: "11",
       stop: "1",
     },
     aircraftID: "BOE001",
-    flightStatus: "Pending",
+    flightStatus: PENDING,
   },
   {
     flightID: 4,
@@ -79,13 +81,12 @@ export const flightData = [
       airport: "SG",
       date: "2024-03-09",
     },
-    date: "2024-03-09",
     duration: {
       time: "11",
       stop: "1",
     },
     aircraftID: "ABA001",
-    flightStatus: "Delayed",
+    flightStatus: DELAYED,
   },
   {
     flightID: 5,
@@ -101,13 +102,12 @@ export const flightData = [
       airport: "CNX",
       date: "2024-03-09",
     },
-    date: "2024-03-09",
     duration: {
       time: "11",
       stop: "1",
     },
     aircraftID: "BOE003",
-    flightStatus: "Canceled",
+    flightStatus: CANCELED,
   },
   {
     flightID: 6,
@@ -121,14 +121,14 @@ export const flightData = [
     destination: {
       time: "07:00",
       airport: "CNX",
+      date: "2024-03-09",
     },
-    date: "2024-03-09",
     duration: {
       time: "11",
       stop: "1",
     },
     aircraftID: "ABA002",
-    flightStatus: "Canceled",
+    flightStatus: CANCELED,
   },
   {
     flightID: 7,
@@ -144,13 +144,12 @@ export const flightData = [
       airport: "CNX",
       date: "2024-03-09",
     },
-    date: "2024-03-09",
     duration: {
       time: "11",
       stop: "1",
     },
     aircraftID: "ABA002",
-    flightStatus: "Pending",
+    flightStatus: PENDING,
   },
   {
     flightID: 8,
@@ -166,13 +165,12 @@ export const flightData = [
       airport: "CNX",
       date: "2024-03-09",
     },
-    date: "2024-03-09",
     duration: {
       time: "11",
       stop: "1",
     },
     aircraftID: "BOE003",
-    flightStatus: "Completed",
+    flightStatus: COMPLETED,
   },
   {
     flightID: 9,
@@ -188,13 +186,12 @@ export const flightData = [
       airport: "JPN",
       date: "2024-03-09",
     },
-    date: "2024-03-09",
     duration: {
       time: "2",
       stop: "5",
     },
     aircraftID: "BOE004",
-    flightStatus: "Pending",
+    flightStatus: PENDING,
   },
   {
     flightID: 10,
@@ -210,13 +207,12 @@ export const flightData = [
       airport: "JPN",
       date: "2024-03-09",
     },
-    date: "2024-03-09",
     duration: {
       time: "2",
       stop: "8",
     },
     aircraftID: "BOE004",
-    flightStatus: "Completed",
+    flightStatus: COMPLETED,
   },
   {
     flightID: 11,
@@ -232,13 +228,12 @@ export const flightData = [
       airport: "KR",
       date: "2024-03-09",
     },
-    date: "2024-03-09",
     duration: {
       time: "2",
       stop: "7",
     },
     aircraftID: "BOE002",
-    flightStatus: "Pending",
+    flightStatus: PENDING,
   },
   {
     flightID: 12,
@@ -252,13 +247,13 @@ export const flightData = [
     destination: {
       time: "14:00",
       airport: "KR",
+      date: "2024-03-09",
     },
-    date: "2024-03-09",
     duration: {
       time: "2",
       stop: "5",
     },
     aircraftID: "BOE002",
-    flightStatus: "Completed",
+    flightStatus: COMPLETED,
   },
 ];

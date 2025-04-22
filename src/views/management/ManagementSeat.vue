@@ -1,7 +1,9 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import ManagementOverview from "@/components/ManagementOverview.vue";
+import { formatDate } from "@/utils/flightUtils";
 import { useSeatStore } from "@/stores/seatStore";
+import { useFlightStore } from "@/stores/flightStore";
 import Dropdown from "@/components/Dropdown.vue";
 import { useRouter, useRoute } from "vue-router";
 import { seatDataInfo } from "@/data/management-seat.js";
@@ -15,6 +17,7 @@ import {
 
 onMounted(() => {
   seatStore.loadSeats();
+  flightStore.loadFlights();
   document.addEventListener("click", handleClickOutside);
 });
 
@@ -28,12 +31,84 @@ const route = useRoute();
 const flightID = Number(route.params.flightID);
 
 const selectedClassTypeId = ref("economy");
-const selectedPassengerSeat = ref(null);
 const isStatusDropdownOpen = ref(false);
 const isEditPassengerSeat = ref(false);
 const editAreaRef = ref(null);
-const statusAllSeats = ref("");
 const seatStore = useSeatStore();
+const flightStore = useFlightStore();
+
+const selectedFlightForm = ref({
+  flightID: flightID,
+  isSeatAvailable: "not-available", 
+  departure: {
+    airport: "",
+    time: "",
+    date: "",
+  },
+  destination: {
+    time: "",
+    airport: "",
+    date: "",
+  },
+});
+
+const selectedPassengerSeat = ref(null);
+
+// ดูการเปลี่ยนเเปลงของ flightID เเล้วอัพเดทใน selectedFlightForm เป็นข้อมูลของ flightID นั้นๆ
+watch(
+  () => flightStore.getFlightByID(flightID),
+  (flight) => {
+    if (flight) {
+      const isSeatAvailable =
+        flight.isSeatAvailable === true ? "available" : "not-available";
+
+      Object.assign(selectedFlightForm.value, {
+        ...flight,
+        isSeatAvailable: isSeatAvailable,
+      });
+    }
+  },
+  { immediate: true }
+);
+
+// ดูการเปลี่ยนแปลงของ seat availability flight เเล้วอัพเดทใน flightStore
+watch(
+  () => selectedFlightForm.value.isSeatAvailable,
+  (newStatus, oldStatus) => {
+    const newAvailable = newStatus === "available";
+    const oldAvailable = oldStatus === "available";
+
+    if (newAvailable !== oldAvailable && oldStatus !== undefined) {
+      flightStore.updateSeatFlightAvailability(flightID, newAvailable);
+    }
+  }
+);
+
+// ดูการเปลี่ยนแปลงของ seat check-in status เเล้วอัพเดทใน seatStore
+const originalCheckedInStatus = ref(null);
+
+watch(isEditPassengerSeat, (isEditing) => {
+  const seat = selectedPassengerSeat.value;
+  const currentStatus = seat?.isCheckedIn;
+
+  if (isEditing) {
+    originalCheckedInStatus.value = currentStatus;
+    return;
+  }
+
+  if (
+    seat &&
+    originalCheckedInStatus.value !== null &&
+    currentStatus !== originalCheckedInStatus.value
+  ) {
+    seatStore.updateSeatCheckInStatus(
+      flightID,
+      seat.seatID,
+      seat.seatClass,
+      currentStatus
+    );
+  }
+});
 
 const economySeatData = computed(() => {
   return seatStore.getEconomySeatsByFlightId(flightID);
@@ -107,9 +182,6 @@ const selectSeat = (rowNum, col) => {
     selectedPassengerSeat.value = null;
   } else {
     selectedPassengerSeat.value = seat;
-    console.log(
-      `Selected Seat: ${seat.seatID}, Class: ${classType}, Status: ${seat.availability}, Checked In: ${seat.isCheckedIn}`
-    );
   }
 };
 
@@ -147,18 +219,28 @@ const handleClickOutside = (event) => {
         </button>
 
         <div class="flight-details">
-          <div class="date">
-            <p>Mar 09,</p>
-            <p>2025</p>
-          </div>
+          <div
+            class="date"
+            v-html="
+              formatDate(selectedFlightForm.departure.date).replace(
+                ',',
+                ',<br>'
+              )
+            "
+          ></div>
+
           <div class="route">
             <div class="departure">
               <div class="departure-icon">
                 <img src="/dashboard-pic/plane-booking-up.png" alt="" />
               </div>
               <div class="departure-details">
-                <span class="airport-code">BKK</span>
-                <span class="time">18:00</span>
+                <span class="airport-code">
+                  {{ selectedFlightForm.departure.airport }}
+                </span>
+                <span class="time">
+                  {{ selectedFlightForm.departure.time }}
+                </span>
               </div>
             </div>
 
@@ -182,8 +264,12 @@ const handleClickOutside = (event) => {
                 <img src="/dashboard-pic/plane-booking-down.png" alt="" />
               </div>
               <div class="arrival-details">
-                <span class="airport-code">CNX</span>
-                <span class="time">18:00</span>
+                <span class="airport-code">
+                  {{ selectedFlightForm.destination.airport }}
+                </span>
+                <span class="time">
+                  {{ selectedFlightForm.destination.time }}
+                </span>
               </div>
             </div>
           </div>
@@ -225,10 +311,9 @@ const handleClickOutside = (event) => {
           </div>
           <input type="text" placeholder="Search Seat" class="search-input" />
         </div>
-
         <div class="status-selector">
           <Dropdown
-            v-model="statusAllSeats"
+            v-model="selectedFlightForm.isSeatAvailable"
             :statusOptions="statusOptionsAllSeats"
           >
             <template #trigger="{ selected }">
@@ -236,20 +321,10 @@ const handleClickOutside = (event) => {
                 v-if="selected"
                 :class="['badge', selected?.class?.toLowerCase()]"
               >
-                {{ selected.label }}
+                {{ selected.label || selectedFlightForm.isSeatAvailable }}
               </span>
-              <span v-else>Select Status</span>
             </template>
           </Dropdown>
-
-          <div class="status-dropdown" v-if="isStatusDropdownOpen">
-            <div class="status-option available">
-              <span>Available</span>
-            </div>
-            <div class="status-option not-available">
-              <span>Not Available</span>
-            </div>
-          </div>
         </div>
       </div>
     </template>

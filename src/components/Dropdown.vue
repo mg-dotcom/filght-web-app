@@ -3,7 +3,7 @@ import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 
 const props = defineProps({
   modelValue: {
-    type: [String, Boolean, Number],
+    type: [String, Number, Boolean, Object, null],
     required: true,
   },
   statusOptions: {
@@ -13,8 +13,15 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update:modelValue"]);
+onMounted(() => {
+  window.addEventListener("click", handleClickOutside);
+});
 
+onBeforeUnmount(() => {
+  window.removeEventListener("click", handleClickOutside);
+});
+
+const emit = defineEmits(["update:modelValue"]);
 const isOpen = ref(false);
 const dropdownRef = ref(null);
 
@@ -32,13 +39,6 @@ const handleClickOutside = (e) => {
     isOpen.value = false;
   }
 };
-
-onMounted(() => {
-  window.addEventListener("click", handleClickOutside);
-});
-onBeforeUnmount(() => {
-  window.removeEventListener("click", handleClickOutside);
-});
 
 const selectedOption = computed(() => {
   if (!props.statusOptions || !Array.isArray(props.statusOptions)) {

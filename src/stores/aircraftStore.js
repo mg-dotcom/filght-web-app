@@ -26,5 +26,15 @@ export const useAircraftStore = defineStore("aircraft", {
     loadAircrafts() {
       this.aircraft = aircraftData;
     },
+    updateAircraftStatus(aircraftID, status) {
+      const index = this.aircraft.findIndex((a) => a.aircraftID === aircraftID);
+      if (index !== -1) {
+        const updated = {
+          ...this.aircraft[index],
+          aircraftStatus: status,
+        };
+        this.aircraft.splice(index, 1, updated);
+      }
+    },
   },
 });

@@ -342,7 +342,7 @@ onBeforeUnmount(() => {
       </div>
     </div>
   </Transition>
-  <!-- Confirmation Modal -->
+
   <ModalConfirm
     :mode="mode"
     :isShowConfirmModal="isShowConfirmModal"

@@ -1,7 +1,6 @@
 <script setup>
 import { ref, defineProps, defineEmits, watch } from "vue";
 import { useAircraftStore } from "@/stores/aircraftStore";
-import { useFlightStore } from "@/stores/flightStore";
 import { useAirlineStore } from "@/stores/airlineStore";
 import { onMounted } from "vue";
 
@@ -10,7 +9,6 @@ import Dropdown from "../Dropdown.vue";
 const emit = defineEmits(["close"]);
 const aircraftStore = useAircraftStore();
 const airlineStore = useAirlineStore();
-const flightStore = useFlightStore();
 
 const props = defineProps({
   showAircraft: {
@@ -42,17 +40,6 @@ const form = ref({
   aircraftStatus: "",
 });
 
-const originalForm = ref({});
-
-watch(
-  () => props.showAircraft,
-  (newVal) => {
-    if (newVal) {
-      originalForm.value = JSON.parse(JSON.stringify(form.value));
-    }
-  }
-);
-
 // ดึงข้อมูลจาก store ตาม aircraftID ที่ส่งเข้ามา
 watch(
   () => props.aircraftID,
@@ -78,9 +65,17 @@ watch(
   { immediate: true }
 );
 
+const isFormChanged = () => {
+  const currentAircraft = aircraftStore.getAircraftByID(form.value.aircraftID);
+  return form.value.aircraftStatus !== currentAircraft?.aircraftStatus;
+};
+
 const handleClose = () => {
-  if (form.value.status !== originalForm.value.status) {
-    console.log("ส่ง status ใหม่:", form.value.status);
+  if (isFormChanged()) {
+    aircraftStore.updateAircraftStatus(
+      form.value.aircraftID,
+      form.value.aircraftStatus
+    );
   }
   emit("close");
 };
@@ -144,9 +139,9 @@ const handleClose = () => {
               </div>
 
               <div class="form-row inputs">
-                <input type="text" v-model="form.airline" />
-                <input type="text" v-model="form.aircraftID" />
-                <input type="number" v-model="form.capacity" />
+                <input type="text" v-model="form.airline" disabled />
+                <input type="text" v-model="form.aircraftID" disabled />
+                <input type="number" v-model="form.capacity" disabled />
               </div>
 
               <div
@@ -169,8 +164,8 @@ const handleClose = () => {
                   align-items: center;
                 "
               >
-                <input type="text" v-model="form.model" />
-                <input type="text" v-model="form.registrationNumber" />
+                <input type="text" v-model="form.model" disabled />
+                <input type="text" v-model="form.registrationNumber" disabled />
               </div>
             </div>
           </div>
@@ -411,6 +406,7 @@ input {
   color: #5a6777;
   background-color: #f0f5fa;
   width: 100%;
+  cursor: not-allowed;
 }
 
 input::placeholder {

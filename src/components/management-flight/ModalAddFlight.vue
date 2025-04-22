@@ -1,6 +1,5 @@
 <script setup>
 import { ref, defineProps, defineEmits, onMounted, computed } from "vue";
-import { formatDate } from "@/utils/flightUtils";
 import ModalConfirm from "../ModalConfirm.vue";
 import { useAircraftStore } from "@/stores/aircraftStore";
 import { useFlightStore } from "@/stores/flightStore";
@@ -26,11 +25,11 @@ defineProps({
 });
 
 const aircrafts = computed(() => {
-  return aircraftStore.getAircraftsByAirlineID(airlineID);
+  return aircraftStore.getAircraftsByAirlineID(airlineID) || [];
 });
 
 const flights = computed(() => {
-  return flightStore.getAllFlights;
+  return flightStore.getAllFlights || [];
 });
 
 const mode = ref("");
@@ -81,7 +80,6 @@ const discardAddFlight = () => {
 };
 
 const addFlight = () => {
-  // จริงๆ ควรใช้ flights.value หรือ reactive ขึ้นอยู่กับว่าคุณใช้ ref หรือ reactive
   const existingIDs = new Set(flights.value.map((f) => f.flightID));
 
   // สร้าง flightID ใหม่ที่ไม่ซ้ำ
@@ -96,7 +94,6 @@ const addFlight = () => {
     ...flightData,
     flightID: newID,
     airlineID: airlineID,
-    date: formatDate(new Date()),
   };
 
   emit("addFlight", data);

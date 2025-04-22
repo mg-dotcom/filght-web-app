@@ -1,16 +1,37 @@
 import { useAircraftStore } from "@/stores/aircraftStore";
 
-export const formatAircraftModel = (aircraftID) => {
-  const aircraftStore = useAircraftStore(); // เรียกใช้ store หลังจากติดตั้ง Pinia
+export const getAircraftModelPart = (aircraftID, index) => {
+  const aircraftStore = useAircraftStore();
   const model = aircraftStore.getAircraftByID(aircraftID)?.model || "";
   const parts = model.split(" ");
-  return `${parts[0] ?? ""}<br/>${parts[1] ?? ""}`;
+  return parts[index] ?? "";
+};
+
+export const getAircraftStatusClass = (aircraftID) => {
+  const aircraftStore = useAircraftStore();
+  const status = aircraftStore.getAircraftByID(aircraftID)?.aircraftStatus;
+  return status === "not-available"
+    ? "status-AC-not-available"
+    : "status-AC-available";
 };
 
 export const formatDate = (date) => {
-  const year = date.getFullYear(); // ดึงปี
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // ดึงเดือน
-  const day = String(date.getDate()).padStart(2, "0"); // ดึงวันที่
+  const options = { year: "numeric", month: "short", day: "numeric" };
+  const validDate = new Date(date);
+  return validDate.toLocaleDateString("en-US", options);
+};
 
-  return `${year}-${month}-${day}`;
+export const mapFlightStatus = (status) => {
+  switch (status) {
+    case "pending":
+      return "Pending";
+    case "completed":
+      return "Completed";
+    case "delayed":
+      return "Delayed";
+    case "canceled":
+      return "Canceled";
+    default:
+      return "Unknown Status";
+  }
 };

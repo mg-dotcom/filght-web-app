@@ -2,13 +2,17 @@
 import ManagementOverview from "@/components/ManagementOverview.vue";
 import FlightPagination from "@/components/management-flight/FlightPagination.vue";
 import ModalAddFlight from "@/components/management-flight/ModalAddFlight.vue";
-import { ref, computed, onMounted } from "vue";
+import { formatDate, mapFlightStatus } from "@/utils/flightUtils";
+import { ref, onMounted } from "vue";
 import { useFlightStore } from "@/stores/flightStore";
 import { useAircraftStore } from "@/stores/aircraftStore";
 import { useRouter, useRoute } from "vue-router";
 import Dropdown from "@/components/Dropdown.vue";
 import ModalAircraft from "@/components/management-flight/ModalAircraft.vue";
-import { formatAircraftModel } from "@/utils/flightUtils";
+import {
+  getAircraftModelPart,
+  getAircraftStatusClass,
+} from "@/utils/flightUtils";
 
 const tableHeaders = [
   { label: "SeatAvailable" },
@@ -183,8 +187,8 @@ const showModalInfoAircraft = (aircraftID) => {
                 <img
                   src="/dashboard-pic/icons/plane-icon.png"
                   :class="{
-                    animate: flight.flightStatus === 'Pending',
-                    center: flight.flightStatus !== 'Pending',
+                    animate: flight.flightStatus === 'pending',
+                    center: flight.flightStatus !== 'pending',
                   }"
                   alt=""
                 />
@@ -209,26 +213,31 @@ const showModalInfoAircraft = (aircraftID) => {
             </div>
           </div>
 
-          <div class="flight-cell date-cell">{{ flight.date }}</div>
+          <div class="flight-cell date-cell">
+            {{ formatDate(flight.departure.date) }}
+          </div>
 
           <div
             class="flight-cell aircraft-cell"
             @click="showModalInfoAircraft(flight.aircraftID)"
           >
-            <p v-html="formatAircraftModel(flight.aircraftID)"></p>
+            <p :class="getAircraftStatusClass(flight.aircraftID)">
+              {{ getAircraftModelPart(flight.aircraftID, 0) }}<br />
+              {{ getAircraftModelPart(flight.aircraftID, 1) }}
+            </p>
           </div>
 
           <div class="flight-cell status-cell">
             <span
               class="status-badge"
               :class="{
-                'status-completed': flight.flightStatus === 'Completed',
-                'status-canceled': flight.flightStatus === 'Canceled',
-                'status-pending': flight.flightStatus === 'Pending',
-                'status-delayed': flight.flightStatus === 'Delayed',
+                'status-completed': flight.flightStatus === 'completed',
+                'status-canceled': flight.flightStatus === 'canceled',
+                'status-pending': flight.flightStatus === 'pending',
+                'status-delayed': flight.flightStatus === 'delayed',
               }"
             >
-              {{ flight.flightStatus }}
+              {{ mapFlightStatus(flight.flightStatus) }}
             </span>
           </div>
 
@@ -627,20 +636,41 @@ const showModalInfoAircraft = (aircraftID) => {
   margin-top: 4px;
 }
 
-/* Date and Aircraft Cells Styling */
 .aircraft-cell {
   cursor: pointer;
 }
 
-.aircraft-cell:hover {
-  color: #3f4957; /* A bit gray color */
+.status-AC-not-available {
+  color: var(--c-soft-blue);
+}
+
+.status-AC-not-available:hover {
+  color: var(--c-soft-blue);
   cursor: pointer;
   text-decoration: underline;
   transition: color 0.3s ease, text-decoration 0.3s ease;
 }
+
+.status-AC-available {
+  color: var(--vt-c-gray-5);
+}
+
+.status-AC-available:hover {
+  color: var(--vt-c-gray-5);
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+.aircraft-cell:hover {
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
 .date-cell,
 .aircraft-cell {
-  color: #64748b;
+  color: var(--vt-c-gray-5);
   font-weight: 500;
   line-height: 1.4;
 }

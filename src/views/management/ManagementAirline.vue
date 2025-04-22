@@ -21,6 +21,10 @@ const addAirline = (newAirline) => {
 const showModalAddAirline = () => {
   isShowModalAddAirline.value = true;
 };
+
+const handleSearch = (event) => {
+  airlineStore.setSearchQuery(event.target.value);
+};
 </script>
 
 <template>
@@ -37,6 +41,7 @@ const showModalAddAirline = () => {
               type="text"
               placeholder="Search Admin"
               class="search-input"
+              @input="handleSearch"
             />
           </div>
 
