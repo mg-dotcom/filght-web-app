@@ -56,6 +56,7 @@ export const useFlightStore = defineStore("flight", {
           ...this.flights[index],
           isSeatAvailable: isSeatAvailable,
         };
+
         this.flights.splice(index, 1, updated);
       }
     },

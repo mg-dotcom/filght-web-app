@@ -8,6 +8,7 @@ export const flightData = [
     flightID: 1,
     airlineID: "SG1234",
     isSeatAvailable: true,
+    status: "pending",
     departure: {
       airport: "BKK",
       time: "18:00",

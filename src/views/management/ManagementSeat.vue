@@ -76,7 +76,7 @@ watch(
 watch(
   () => selectedFlightForm.value.isSeatAvailable,
   (newStatus, oldStatus) => {
-    const newAvailable = newStatus === "available";
+    const newAvailable = newStatus === "available"; 
     const oldAvailable = oldStatus === "available";
 
     if (newAvailable !== oldAvailable && oldStatus !== undefined) {
