@@ -35,5 +35,19 @@ export const useAirlineStore = defineStore("airline", {
       const trimmedQuery = query.trim().toLowerCase();
       this.searchQuery = trimmedQuery;
     },
+    updateAirlineStatus(airlineID, status) {
+      const index = this.airlines.findIndex(
+        (flight) => flight.airlineID === airlineID
+      );
+      if (index !== -1) {
+        const updated = {
+          ...this.airlines[index],
+          airlineStatus: status,
+        };
+
+        this.airlines.splice(index, 1, updated);
+      }
+      console.log(this.airlines[index]);
+    },
   },
 });

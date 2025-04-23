@@ -1,5 +1,4 @@
 <script setup>
-import { airlineData } from "@/data/management-airline.js";
 import ModalAddAirline from "@/components/management-airline/ModalAddAirline.vue";
 import { useAirlineStore } from "@/stores/airlineStore";
 import { useRouter } from "vue-router";
@@ -11,6 +10,7 @@ const isShowModalAddAirline = ref(false);
 
 onMounted(() => {
   airlineStore.loadAirlines();
+  airlineStore.setSearchQuery("");
 });
 
 const addAirline = (newAirline) => {
@@ -89,7 +89,19 @@ const handleSearch = (event) => {
         </div>
 
         <div class="card-section status-section" style="grid-area: status">
-          <div class="airline-status">Status</div>
+          <select
+            class="airline-status"
+            v-model="airline.airlineStatus"
+            @change="
+              airlineStore.updateAirlineStatus(
+                airline.airlineID,
+                airline.airlineStatus
+              )
+            "
+          >
+            <option value="open">Open</option>
+            <option value="temporarily-closed">Temporarily Closed</option>
+          </select>
         </div>
 
         <div class="blank-space" style="grid-area: blank-space"></div>
@@ -290,10 +302,32 @@ const handleSearch = (event) => {
 
 .airline-status {
   background-color: white;
-  padding: 2px 25px;
+  border: 1px solid var(--c-navy-light);
   border-radius: 8px;
-  font-size: 12px;
+  padding: 5px 15px;
+  font-size: 14px;
   font-weight: 500;
+  color: var(--c-navy);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.airline-status:hover {
+  border-color: var(--c-navy);
+  box-shadow: 0 4px 8px rgba(57, 116, 153, 0.2);
+}
+
+.airline-status:focus {
+  outline: none;
+  border-color: var(--c-navy);
+  box-shadow: 0 0 5px rgba(57, 116, 153, 0.3);
+}
+
+.airline-status option {
+  font-size: 14px;
+  color: var(--c-navy);
+  background-color: white;
 }
 
 /* ส่วนของ SECTION 2: Main Content styling */

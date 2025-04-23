@@ -1,26 +1,18 @@
-<script setup>
-import { RouterView } from "vue-router";
-import Sidebar from "@/components/Sidebar.vue";
-</script>
-
 <template>
   <div class="app-container">
-    <Sidebar class="sidebar" />
-    <main class="main-content">
-      <RouterView />
-    </main>
+    <Sidebar v-if="showLayout" />
+    <div class="main-content" v-if="showLayout">
+      <router-view />
+    </div>
+    <RouterView v-else />
   </div>
 </template>
 
-<style scoped>
-.app-container {
-  display: flex;
-  height: 100vh;
-}
-.main-content {
-  flex: 1;
-  padding: 20px;
-  color: var(--c-light-navy);
-  overflow-y: auto;
-}
-</style>
+<script setup>
+import { computed } from "vue";
+import { useRoute } from "vue-router";
+import Sidebar from "@/components/Sidebar.vue";
+
+const route = useRoute();
+const showLayout = computed(() => route.meta.layout !== false);
+</script>
