@@ -35,7 +35,7 @@ const handleSearch = (event) => {
         <div class="controls">
           <div class="search-container">
             <div class="search-icon">
-              <img src="/search-input.svg" alt="" />
+              <img src="/search-input.svg" alt="Searc Input Icon" />
             </div>
             <input
               type="text"

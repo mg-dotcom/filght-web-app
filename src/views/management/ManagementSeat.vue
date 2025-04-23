@@ -76,7 +76,7 @@ watch(
 watch(
   () => selectedFlightForm.value.isSeatAvailable,
   (newStatus, oldStatus) => {
-    const newAvailable = newStatus === "available"; 
+    const newAvailable = newStatus === "available";
     const oldAvailable = oldStatus === "available";
 
     if (newAvailable !== oldAvailable && oldStatus !== undefined) {
@@ -257,7 +257,10 @@ const clearSearch = () => {
           <div class="route">
             <div class="departure">
               <div class="departure-icon">
-                <img src="/dashboard-pic/plane-booking-up.png" alt="" />
+                <img
+                  src="/dashboard-pic/plane-booking-up.png"
+                  alt="Plane Booking Up"
+                />
               </div>
               <div class="departure-details">
                 <span class="airport-code">
@@ -286,7 +289,10 @@ const clearSearch = () => {
 
             <div class="arrival">
               <div class="departure-icon">
-                <img src="/dashboard-pic/plane-booking-down.png" alt="" />
+                <img
+                  src="/dashboard-pic/plane-booking-down.png"
+                  alt="Plane Booking Down"
+                />
               </div>
               <div class="arrival-details">
                 <span class="airport-code">
@@ -424,28 +430,28 @@ const clearSearch = () => {
           <div class="type-seat">
             <div class="type reserve-seat">
               <img
-                src="/management-pic/management-seat/reserve-seat-type.png"
-                alt=""
+              src="/management-pic/management-seat/reserve-seat-type.png"
+              alt="Reserved Seat Icon"
               />
               <p>
-                Reserved<br />
-                Seat
+              Reserved<br />
+              Seat
               </p>
             </div>
             <div class="type reserve-seat">
               <img
-                src="/management-pic/management-seat/passenger-seat-type.png"
-                alt=""
+              src="/management-pic/management-seat/passenger-seat-type.png"
+              alt="Passenger Seat Icon"
               />
               <p>
-                Passenger<br />
-                Seat
+              Passenger<br />
+              Seat
               </p>
             </div>
             <div class="type reserve-seat">
               <img
-                src="/management-pic/management-seat/unreserve-seat-type.png"
-                alt=""
+              src="/management-pic/management-seat/unreserve-seat-type.png"
+              alt="Unreserved Seat Icon"
               />
               <p>Unreserved <br />Seat</p>
             </div>

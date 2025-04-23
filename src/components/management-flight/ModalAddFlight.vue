@@ -65,13 +65,30 @@ const form = ref({
   flightStatus: "Pending",
 });
 
-const showConfirmAddFlight = () => {
-  isShowConfirmModal.value = true;
-};
+const isFormValid = computed(() => {
+  const f = form.value;
+  return (
+    f.departure.airport &&
+    f.departure.date &&
+    f.departure.time &&
+    f.destination.airport &&
+    f.destination.date &&
+    f.destination.time &&
+    f.aircraftID &&
+    f.duration.stop !== "" &&
+    f.duration.time !== ""
+  );
+});
 
 const confirmAddFlight = () => {
-  mode.value = "success";
-  showConfirmAddFlight();
+  if (isFormValid.value) {
+    mode.value = "success";
+    showConfirmAddFlight();
+  }
+};
+
+const showConfirmAddFlight = () => {
+  isShowConfirmModal.value = true;
 };
 
 const discardAddFlight = () => {
@@ -127,7 +144,11 @@ const closeModal = () => {
           <div class="modal-add-flight">
             <div class="modal-header">
               <div class="modal-action">
-                <div @click="confirmAddFlight" class="check-button">
+                <div
+                  @click="isFormValid ? confirmAddFlight() : null"
+                  :class="{ disabled: !isFormValid }"
+                  class="check-button"
+                >
                   <!-- Confirm Button SVG -->
                   <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
                     <rect
@@ -371,6 +392,11 @@ const closeModal = () => {
 .check-button,
 .close-button {
   cursor: pointer;
+}
+
+.check-button.disabled {
+  cursor: not-allowed;
+  filter: brightness(0.6);
 }
 
 .check-button:hover svg rect,

@@ -226,10 +226,13 @@ const updatedFlightsScheduleAnalysisData = {
           <div class="stat-value">{{ stat.value }}</div>
         </div>
         <div class="plane-icon" v-if="index !== stats.length - 1">
-          <img src="/dashboard-pic/plane-type-flight.png" alt="" />
+          <img
+            src="/dashboard-pic/plane-type-flight.png"
+            alt="Plane Type Flight"
+          />
         </div>
         <div class="world-map-icon" v-else>
-          <img src="/dashboard-pic/world-map.png" alt="" />
+          <img src="/dashboard-pic/world-map.png" alt="World Map" />
         </div>
       </div>
     </div>
@@ -255,7 +258,10 @@ const updatedFlightsScheduleAnalysisData = {
             <!-- Left Side: Flight Path -->
             <div class="booking-left">
               <div class="departure">
-                <img src="/dashboard-pic/plane-booking-up.png" alt="" />
+                <img
+                  src="/dashboard-pic/plane-booking-up.png"
+                  alt="Plane Booking Up"
+                />
                 <div class="departure-info">
                   <div class="time">{{ booking.departure.time }}</div>
                   <div class="airport">{{ booking.departure.airport }}</div>
@@ -267,7 +273,10 @@ const updatedFlightsScheduleAnalysisData = {
                   {{ booking.stops.time }}
                 </p>
                 <div class="line">
-                  <img src="/dashboard-pic/icons/plane-icon.png" alt="" />
+                  <img
+                    src="/dashboard-pic/icons/plane-icon.png"
+                    alt="Plane Icon"
+                  />
                 </div>
                 <p>
                   {{ booking.stops.stop }}
@@ -275,7 +284,10 @@ const updatedFlightsScheduleAnalysisData = {
               </div>
 
               <div class="arrival">
-                <img src="/dashboard-pic/plane-booking-down.png" alt="" />
+                <img
+                  src="/dashboard-pic/plane-booking-down.png"
+                  alt="Plane Booking Down"
+                />
                 <div class="arrival-info">
                   <div class="time">{{ booking.arrival.time }}</div>
                   <div class="airport">{{ booking.arrival.airport }}</div>
@@ -288,11 +300,11 @@ const updatedFlightsScheduleAnalysisData = {
               <div class="booking-airline">{{ booking.airline }}</div>
               <div class="booking-details">
                 <div class="date">
-                  <img src="/dashboard-pic/icons/calendar-icon.png" alt="" />
+                  <img src="/dashboard-pic/icons/calendar-icon.png" alt="Calendar Icon" />
                   <p>{{ booking.date }}</p>
                 </div>
                 <div class="seats">
-                  <img src="/dashboard-pic/icons/group-icon.png" alt="" />
+                  <img src="/dashboard-pic/icons/group-icon.png" alt="Group Icon" />
                   <p>{{ booking.seats }}</p>
                 </div>
               </div>
@@ -504,6 +516,7 @@ const updatedFlightsScheduleAnalysisData = {
   display: grid;
   grid-template-columns: 1.55fr 1fr;
   gap: 20px;
+  padding: 0;
 }
 
 /* ส่วนของ Bookings Section */
@@ -548,8 +561,8 @@ const updatedFlightsScheduleAnalysisData = {
   background-color: var(--vt-c-white);
   border-radius: 10px;
   padding: 35px;
-  overflow: visible; 
-  position: relative; 
+  overflow: visible;
+  position: relative;
 }
 
 .bookings-list {
@@ -559,7 +572,7 @@ const updatedFlightsScheduleAnalysisData = {
 }
 
 .bookings-header {
-  position: relative; 
+  position: relative;
   color: var(--vt-c-gray);
   display: grid;
   grid-template-columns: 3fr 1fr;

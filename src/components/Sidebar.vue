@@ -64,7 +64,7 @@ const activeUsers = [
         >
           <div v-if="item.label !== 'Active Users'" class="nav-item-content">
             <div class="icon">
-              <img :src="iconMap[item.icon]" :alt="item.label + ' icon'" />
+              <img :src="iconMap[item.icon]" :alt="item.label + ' Icon'" />
             </div>
             <span class="nav-label">{{ item.label }}</span>
           </div>

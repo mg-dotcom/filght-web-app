@@ -53,7 +53,7 @@ onMounted(() => {
   flightStore.loadFlights();
   aircraftStore.loadAircrafts();
   // reset ค่า query เเละ status ของ flightStore
-  flightStore.setSelectedStatus(null); 
+  flightStore.setSelectedStatus(null);
   flightStore.setSearchQuery("");
 });
 
@@ -106,7 +106,7 @@ watch(status, (newStatus) => {
       <div class="controls">
         <div class="search-container">
           <div class="search-icon">
-            <img src="/search-input.svg" alt="" />
+            <img src="/search-input.svg" alt="Search Input Icon" />
           </div>
           <input
             type="text"
@@ -208,7 +208,7 @@ watch(status, (newStatus) => {
                     animate: flight.flightStatus === 'pending',
                     center: flight.flightStatus !== 'pending',
                   }"
-                  alt=""
+                  alt="Plane Icon"
                 />
               </div>
               <p>{{ flight.duration.stop }} stop</p>

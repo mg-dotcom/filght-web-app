@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, defineEmits, onMounted, onBeforeUnmount } from "vue";
+import { ref, defineProps, defineEmits, computed, onBeforeUnmount } from "vue";
 import ModalConfirm from "../ModalConfirm.vue";
 import Dropdown from "@/components/Dropdown.vue";
 
@@ -43,12 +43,30 @@ const form = ref({
   airlineColor: "#ffffff",
 });
 
-const confirmAddFlight = () => {
-  mode.value = "success";
-  showConfirmAddFlight();
+const isFormValid = computed(() => {
+  const f = form.value;
+  return (
+    f.airlineID &&
+    f.name &&
+    f.name_short &&
+    f.code &&
+    f.contactPrefix &&
+    f.contactNumber &&
+    f.country &&
+    f.headquarters &&
+    f.airlineImage &&
+    f.airlineStatus
+  );
+});
+
+const confirmAddAirline = () => {
+  if (isFormValid.value) {
+    mode.value = "success";
+    showConfirmAddFlight();
+  }
 };
 
-const discardAddFlight = () => {
+const discardAddAirline = () => {
   mode.value = "discard";
   showConfirmAddFlight();
 };
@@ -131,7 +149,11 @@ onBeforeUnmount(() => {
           <div class="modal-add-airline">
             <div class="modal-header">
               <div class="modal-action">
-                <div @click="confirmAddFlight" class="check-button">
+                <div
+                  @click="isFormValid ? confirmAddAirline() : null"
+                  :class="{ disabled: !isFormValid }"
+                  class="check-button"
+                >
                   <!-- Confirm Button SVG -->
                   <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
                     <rect
@@ -150,7 +172,7 @@ onBeforeUnmount(() => {
                   </svg>
                 </div>
 
-                <div class="check-button" @click="discardAddFlight">
+                <div class="check-button" @click="discardAddAirline">
                   <svg
                     width="30"
                     height="30"
@@ -441,6 +463,11 @@ onBeforeUnmount(() => {
 .check-button,
 .close-button {
   cursor: pointer;
+}
+
+.check-button.disabled {
+  cursor: not-allowed;
+  filter: brightness(0.6);
 }
 
 .check-button:hover svg rect,
