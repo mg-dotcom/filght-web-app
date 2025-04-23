@@ -38,7 +38,7 @@ const activeUsers = [
       <div class="profile-info">
         <h3>Admin</h3>
         <p>admin.cpearline@gmail.com</p>
-        <button class="logout-btn">
+        <button class="logout-btn" @click="router.push({ name: 'login' })">
           <div class="icon">
             <img :src="iconMap.logout" alt="Logout icon" />
           </div>
