@@ -62,16 +62,12 @@ const form = ref({
     stop: "",
   },
   aircraftID: "",
-  flightStatus: "Pending",
+  flightStatus: "",
 });
 
 const isFormValid = computed(() => {
   const f = form.value;
-  // First check if flightStatus exists and is not empty
-  const hasValidStatus =
-    f.flightStatus &&
-    statusOptions.some((option) => option.value === f.flightStatus);
-
+  
   return (
     f.departure.airport &&
     f.departure.date &&
@@ -82,7 +78,7 @@ const isFormValid = computed(() => {
     f.aircraftID &&
     f.duration.stop !== "" &&
     f.duration.time !== "" &&
-    hasValidStatus // Use our new status validation
+    f.flightStatus != ""
   );
 });
 
